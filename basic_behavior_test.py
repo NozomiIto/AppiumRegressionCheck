@@ -122,7 +122,7 @@ class IOSSimulator10BehaviorTest(BasicBehaviorTestBase):
             'showXcodeLog': True,
             target_key: target_value
         }
-        # rest only for first test with this capabilities
+        # reset only for first test with this capabilities
         if not IOSSimulator11BehaviorTest.reset_called and not fast_run_mode:
             print("clear state")
             self._kill_all_existing_ios_related_processes()
@@ -150,7 +150,7 @@ class IOSSimulator11BehaviorTest(BasicBehaviorTestBase):
             'showXcodeLog': True,
             target_key: target_value
         }
-        # rest only for first test with this capabilities
+        # reset only for first test with this capabilities
         if not IOSSimulator10BehaviorTest.reset_called and not fast_run_mode:
             print("clear state")
             self._kill_all_existing_ios_related_processes()
@@ -180,7 +180,7 @@ class IOSRealDeviceBehaviorTest(BasicBehaviorTestBase):
             'xcodeOrgId': os.environ["APPLE_TEAM_ID_FOR_MAGIC_POD"],
             target_key: target_value
         }
-        # rest only for first test with this capabilities
+        # reset only for first test with this capabilities
         if not IOSRealDeviceBehaviorTest.reset_called and not fast_run_mode:
             print("clear state")
             self._kill_all_existing_ios_related_processes()
@@ -208,7 +208,7 @@ class AndroidRealDeviceBehaviorTest(BasicBehaviorTestBase):
         }
         if target_key2 is not None:
             caps[target_key2] = target_value2
-        # Rest only for first test with this capabilities
+        # Reset only for first test with this capabilities
         # Since Android real device clear is not slow, clear is called even for fast_run_mode
         if not AndroidRealDeviceBehaviorTest.reset_called and target_key1 == "app":
             print("clear state")
