@@ -9,7 +9,7 @@ import subprocess
 import time
 
 
-test_app_dir = os.path.dirname(os.path.abspath(__file__)) + "/test_app"
+test_app_dir = os.path.dirname(os.path.abspath(__file__)) + "/../test_app"
 
 
 # Calculate easy-to-understand test name
@@ -23,6 +23,8 @@ def custom_name_func(testcase_func, _, param):
 
 # Don't execute slow fullReset, so this may be a little unstable.
 fast_run_mode = False
+appium_cmds = ["appium"]
+#appium_cmds = ["node", "/Users/itonozomi/Documents/GitHub/appium/build/lib/main.js"]
 
 
 # This test checks if the current Appium server and Python client combination works well.
@@ -46,7 +48,7 @@ class BasicBehaviorTestBase(unittest.TestCase):
     def _launch_appium_server(cls):
         print("launch Appium server")
         log_path = "appium_server_{}.log".format(cls.__name__)
-        cmd = ["appium", "--log", log_path, "--session-override", "--log-level", "debug", "--local-timezone"]
+        cmd = appium_cmds + ["--log", log_path, "--session-override", "--log-level", "debug", "--local-timezone"]
         cls.server_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # TODO smarter wait
         time.sleep(10)
@@ -56,12 +58,6 @@ class BasicBehaviorTestBase(unittest.TestCase):
         print("kill Appium server")
         if cls.server_process is not None:
             cls.server_process.kill()
-
-    @staticmethod
-    def _kill_all_existing_ios_related_processes():
-        subprocess.Popen(['killall', 'iOS Simulator']).wait()
-        subprocess.Popen(['killall', 'com.apple.CoreSimulator.CoreSimulatorService']).wait()
-        subprocess.Popen(['killall', 'iproxy']).wait()
 
     @staticmethod
     def _standard_operation_check(caps):
@@ -105,7 +101,6 @@ class BasicBehaviorTestBase(unittest.TestCase):
 
 
 class IOSSimulator10BehaviorTest(BasicBehaviorTestBase):
-    reset_called = False
 
     @parameterized.expand([
         ('app', test_app_dir + "/TestApp.app"),
@@ -120,19 +115,13 @@ class IOSSimulator10BehaviorTest(BasicBehaviorTestBase):
             'deviceName': 'iPhone 7',
             'automationName': 'XCUITest',
             'showXcodeLog': True,
+            'wdaLocalPort': 8100,
             target_key: target_value
         }
-        # reset only for first test with this capabilities
-        if not IOSSimulator11BehaviorTest.reset_called and not fast_run_mode:
-            print("clear state")
-            self._kill_all_existing_ios_related_processes()
-            caps["fullReset"] = True
-            IOSSimulator11BehaviorTest.reset_called = True
         self._standard_operation_check(caps)
 
 
 class IOSSimulator11BehaviorTest(BasicBehaviorTestBase):
-    reset_called = False
 
     @parameterized.expand([
         ('app', test_app_dir + "/UICatalog.app"),
@@ -148,21 +137,15 @@ class IOSSimulator11BehaviorTest(BasicBehaviorTestBase):
             'deviceName': 'iPhone 8',
             'automationName': 'XCUITest',
             'showXcodeLog': True,
+            'wdaLocalPort': 8101,
             target_key: target_value
         }
-        # reset only for first test with this capabilities
-        if not IOSSimulator10BehaviorTest.reset_called and not fast_run_mode:
-            print("clear state")
-            self._kill_all_existing_ios_related_processes()
-            caps["fullReset"] = True
-            IOSSimulator10BehaviorTest.reset_called = True
         self._standard_operation_check(caps)
 
 
 # - iOS real device must be connected
 # - APPLE_TEAM_ID_FOR_MAGIC_POD environment variable must be set
 class IOSRealDeviceBehaviorTest(BasicBehaviorTestBase):
-    reset_called = False
 
     @parameterized.expand([
         ('bundleId', 'com.apple.camera'),
@@ -178,20 +161,14 @@ class IOSRealDeviceBehaviorTest(BasicBehaviorTestBase):
             'showXcodeLog': True,
             'xcodeSigningId': 'iPhone Developer',
             'xcodeOrgId': os.environ["APPLE_TEAM_ID_FOR_MAGIC_POD"],
+            'wdaLocalPort': 8102,
             target_key: target_value
         }
-        # reset only for first test with this capabilities
-        if not IOSRealDeviceBehaviorTest.reset_called and not fast_run_mode:
-            print("clear state")
-            self._kill_all_existing_ios_related_processes()
-            caps["fullReset"] = True
-            IOSRealDeviceBehaviorTest.reset_called = True
         self._standard_operation_check(caps)
 
 
 # Android real device must be connected
 class AndroidRealDeviceBehaviorTest(BasicBehaviorTestBase):
-    reset_called = False
 
     @parameterized.expand([
         ('app', test_app_dir + "/ApiDemos-debug.apk", None, None),
@@ -208,11 +185,4 @@ class AndroidRealDeviceBehaviorTest(BasicBehaviorTestBase):
         }
         if target_key2 is not None:
             caps[target_key2] = target_value2
-        # Reset only for first test with this capabilities
-        # Since Android real device clear is not slow, clear is called even for fast_run_mode
-        if not AndroidRealDeviceBehaviorTest.reset_called and target_key1 == "app":
-            print("clear state")
-            caps["fullReset"] = True
-            AndroidRealDeviceBehaviorTest.reset_called = True
         self._standard_operation_check(caps)
-
