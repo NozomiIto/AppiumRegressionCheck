@@ -11,10 +11,19 @@ Test code to check if Appium works well for the various environments.
 - Connect Android real device and iOS real device for which required Appium set up has been completed.
 - Set the following environment variable if necessary.
   - `APPLE_TEAM_ID_FOR_MAGIC_POD`: Your Apple team ID for iOS real device test
-  - `APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD`: Such as `/Users/itonozomi/Documents/GitHub/appium/build/lib/main.js`.
-    If you call main.js by node rather than appium executable, set this environment variable.
 - `npm test`
+
+# Run only specific test
 
 If you want to run only tests for some platform, use the command like the following:
 
 `npm test -- --grep "iOS real device"`
+
+# Run for the Appium server from the latest GtiHub master
+
+Run like the following.
+
+`APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD=/Users/itonozomi/Documents/GitHub/appium/build/lib/main.js npm test`
+
+If `APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD` environment variable is specified,
+the test calls main.js by node instead of the Appium executable.

@@ -36,8 +36,9 @@ let launchAppiumServer = async (javaVersion, port) => {
   process.env["JAVA_HOME"] = await getJavaHomeValue(javaVersion);
   console.log(util.format("launch Appium server with JAVA_HOME=%s", process.env["JAVA_HOME"]));
   let command = appiumCmds[0];
+  let logFileName = util.format("appiumServer_Java%s.log", javaVersion);
   let args = appiumCmds.slice(1).concat(
-    ["--log", "appiumServer.log", "--session-override", "--log-level", "debug", "--local-timezone", "--port", port]);
+    ["--log", logFileName, "--session-override", "--log-level", "debug", "--local-timezone", "--port", port]);
   let proc = childProcess.spawn(command, args);
   return proc;
 }
