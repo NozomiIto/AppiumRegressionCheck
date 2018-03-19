@@ -9,8 +9,11 @@ const util = require("util");
 const childProcess = require("child_process");
 const teenProcess = require('teen_process');
 
-const appiumCmds = ["appium"];
-// const appiumCmds = ["node", "/Users/itonozomi/Documents/GitHub/appium/build/lib/main.js"];
+if (process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD) {
+  var appiumCmds = ["node", process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD];
+} else {
+  var appiumCmds = ["appium"];
+}
 const testAppDir = __dirname + "/../test_app";
 const java8Port = 4723;
 const java9Port = 4724;
@@ -28,7 +31,7 @@ let getJavaHomeValue = async (versionStr) => {
   throw new Error(util.format("JAVA_HOME for % is not found", versionStr));
 }
 
-// returns process object
+// returns: process object
 let launchAppiumServer = async (javaVersion, port) => {
   process.env["JAVA_HOME"] = await getJavaHomeValue(javaVersion);
   console.log(util.format("launch Appium server with JAVA_HOME=%s", process.env["JAVA_HOME"]));
@@ -173,7 +176,8 @@ describe("Appium basic commands", function() {
     // assume following apps have been installed
     ['appPackage', 'com.android.chrome', 'appActivity', 'com.google.android.apps.chrome.Main']
   ])
-  .it("should work with Android real device with Java8: %s=%s", async (targetKey1, targetValue1, targetKey2, targetValue2) => {
+  .it("should work with Android real device with Java8: %s=%s",
+      async (targetKey1, targetValue1, targetKey2, targetValue2) => {
     let caps = {
       'platformName': 'Android',
       'deviceName': 'Android',
@@ -192,7 +196,8 @@ describe("Appium basic commands", function() {
     // assume following apps have been installed
     ['appPackage', 'com.google.android.apps.maps', 'appActivity', 'com.google.android.maps.MapsActivity']
   ])
-  .it("should work with Android real device with Java9: %s=%s", async (targetKey1, targetValue1, targetKey2, targetValue2) => {
+  .it("should work with Android real device with Java9: %s=%s",
+      async (targetKey1, targetValue1, targetKey2, targetValue2) => {
     let caps = {
       'platformName': 'Android',
       'deviceName': 'Android',
