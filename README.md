@@ -5,6 +5,7 @@ Test code to check if Appium works well for the various environments.
 # Usage
 
 - Install Node.js and npm.
+- Install Java8 and Java9 (both required to pass all tests)
 - Install required library by `npm install` in this directory.
 - Install Appium server so that it can be called from the command line.
 - Connect Android real device and iOS real device for which required Appium set up has been completed.
