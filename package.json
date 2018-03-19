@@ -1,0 +1,20 @@
+{
+  "name": "appium_regression_check",
+  "version": "0.0.1",
+  "author": "TRIDENT Inc.",
+  "private": true,
+  "engines": {
+    "node": "7.9.0",
+    "npm": "5.4.2"
+  },
+  "dependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "mocha-each": "^1.1.0",
+    "wd": "^1.2.0",
+    "check-engines": "^1.5.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  }
+}
