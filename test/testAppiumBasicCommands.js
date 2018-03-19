@@ -147,6 +147,7 @@ describe("Appium basic commands", function() {
   // - iOS real device must be connected
   // - APPLE_TEAM_ID_FOR_MAGIC_POD environment variable must be set
   forEach([
+    ['app', testAppDir + "/TestApp.ipa"],
     ['bundleId', 'com.apple.camera'],
     ['bundleId', 'com.apple.Health']
   ])
