@@ -123,9 +123,10 @@ describe("Appium", function() {
     await sleep(5000); // TODO smarter wait
   });
 
-  after(() => {
+  after(async () => {
     killAppiumServer(java8AppiumServer);
     killAppiumServer(java9AppiumServer);
+    await sleep(3000); // TODO smarter wait
   });
 
   describe("simpleCheck", () => {
