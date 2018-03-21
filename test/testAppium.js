@@ -8,6 +8,7 @@ const TouchAction = wd.TouchAction;
 const util = require("util");
 const childProcess = require("child_process");
 const teenProcess = require('teen_process');
+const xml2js = require('xml2js-es6-promise');
 
 if (process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD) {
   var appiumCmds = ["node", process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD];
@@ -65,8 +66,9 @@ let simpleCheck = async (caps, serverPort, finalizer = null) => {
 
     // check page source method works without error
     console.log("page source");
-    let src = await driver.source();
-    assert.isTrue(!!src); // not null nor empty
+    let xmlStr = await driver.source();
+    let parsed = await xml2js(xmlStr);
+    assert.isTrue(!!parsed); // not null
 
     // check taking screen shot works without error
     console.log("screenshot");
@@ -97,8 +99,9 @@ let simpleCheck = async (caps, serverPort, finalizer = null) => {
 
     // check page source method and taking screen shot again after several operations
     console.log("page source again");
-    src = await driver.source();
-    assert.isTrue(!!src); // not null nor empty
+    xmlStr = await driver.source();
+    parsed = await xml2js(xmlStr);
+    assert.isTrue(!!parsed); // not null
     console.log("screenshot again");
     image = await driver.takeScreenshot();
     assert.isTrue(!!image); // not null nor empty
