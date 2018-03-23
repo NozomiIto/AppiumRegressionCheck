@@ -123,7 +123,7 @@ describe("Appium", function() {
   before(async () => {
     java8AppiumServer = await launchAppiumServer("1.8", java8Port);
     java9AppiumServer = await launchAppiumServer("9", java9Port);
-    await sleep(5000); // TODO smarter wait
+    await sleep(8000); // TODO smarter wait
   });
 
   after(async () => {
