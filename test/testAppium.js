@@ -107,7 +107,7 @@ let simpleCheck = async (caps, serverPort, finalizer = null) => {
     assert.isTrue(!!image); // not null nor empty
   } finally {
     if (finalizer != null) {
-      finalizer(driver);
+      await finalizer(driver);
     }
     await driver.quit();
   }
@@ -195,7 +195,7 @@ describe("Appium", function() {
         // to show the camera permission dialog which is displayed only for the initial launch
         caps["fullReset"] = true;
         // close the system dialog at the end of the test
-        var finalizer = (driver) => { driver.acceptAlert(); }
+        var finalizer = async (driver) => { await driver.acceptAlert(); }
       } else {
         var finalizer = null;
       }
