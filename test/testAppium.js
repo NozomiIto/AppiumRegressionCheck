@@ -145,7 +145,8 @@ describe("Appium", function() {
         deviceName: 'iPhone 7',
         automationName: 'XCUITest',
         showXcodeLog: true,
-        wdaLocalPort: iosSimulator10WdaPort
+        wdaLocalPort: iosSimulator10WdaPort,
+        useJSONSource: true
       };
       caps[targetKey] = targetValue;
       await simpleCheck(caps, java8Port);
