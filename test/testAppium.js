@@ -58,6 +58,16 @@ let killAppiumServer = (proc) => {
   }
 }
 
+let checkSourceXmlIsValid = async (xmlStr) => {
+  let parsed = await xml2js(xmlStr);
+  // check that the tree has a certain depth
+  let element1 = parsed[Object.keys(parsed)[0]];
+  let element2 = element1[Object.keys(element1)[0]];
+  let element3 = element2[Object.keys(element2)[0]];
+  let element4 = element3[Object.keys(element3)[0]];
+  assert.isTrue(!!element4); // not null
+}
+
 // finalizer: (driver) => {}. called before quitting the driver.
 let simpleCheck = async (caps, serverPort, finalizer = null) => {
   let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', serverPort));
@@ -67,19 +77,23 @@ let simpleCheck = async (caps, serverPort, finalizer = null) => {
     // check page source method works without error
     console.log("page source");
     let xmlStr = await driver.source();
-    let parsed = await xml2js(xmlStr);
-    assert.isTrue(!!parsed); // not null
+    await checkSourceXmlIsValid(xmlStr);
 
     // check taking screen shot works without error
     console.log("screenshot");
     let image = await driver.takeScreenshot();
     assert.isTrue(!!image); // not null nor empty
 
-    // try to click first element if clickable
+    // try to click one of the elements if clickable
     console.log("find and click");
-    let element = await driver.elementOrNull("xpath", "//*[1]");
+    if (caps["platformName"] == "iOS") {
+      var targetClassName = "XCUIElementTypeOther";
+    } else {
+      var targetClassName = "android.widget.FrameLayout";
+    }
+    let element = await driver.elementOrNull("xpath", util.format("//%s[1]", targetClassName));
     if (element == null) {
-      console.log("not element is found");
+      console.log("no element is found");
     } else {
       if (await element.isDisplayed() && await element.isEnabled()) {
         await element.click();
@@ -100,8 +114,7 @@ let simpleCheck = async (caps, serverPort, finalizer = null) => {
     // check page source method and taking screen shot again after several operations
     console.log("page source again");
     xmlStr = await driver.source();
-    parsed = await xml2js(xmlStr);
-    assert.isTrue(!!parsed); // not null
+    await checkSourceXmlIsValid(xmlStr);
     console.log("screenshot again");
     image = await driver.takeScreenshot();
     assert.isTrue(!!image); // not null nor empty
@@ -145,7 +158,7 @@ describe("Appium", function() {
         deviceName: 'iPhone 7',
         automationName: 'XCUITest',
         showXcodeLog: true,
-        useJSONSource: true,
+        useJSONSource: true, // more stable and faster
         wdaLocalPort: iosSimulator10WdaPort
       };
       caps[targetKey] = targetValue;
@@ -165,7 +178,7 @@ describe("Appium", function() {
         deviceName: 'iPhone 8',
         automationName: 'XCUITest',
         showXcodeLog: true,
-        useJSONSource: true,
+        useJSONSource: true, // more stable and faster
         wdaLocalPort: iosSimulator11WdaPort
       };
       caps[targetKey] = targetValue;
@@ -188,7 +201,7 @@ describe("Appium", function() {
         udid: 'auto',
         automationName: 'XCUITest',
         showXcodeLog: true,
-        useJSONSource: true,
+        useJSONSource: true, // more stable and faster
         xcodeSigningId: 'iPhone Developer',
         xcodeOrgId: process.env.APPLE_TEAM_ID_FOR_MAGIC_POD,
         wdaLocalPort: iosRealDeviceWdaPort
