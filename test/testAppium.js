@@ -145,8 +145,8 @@ describe("Appium", function() {
         deviceName: 'iPhone 7',
         automationName: 'XCUITest',
         showXcodeLog: true,
-        wdaLocalPort: iosSimulator10WdaPort,
-        useJSONSource: true
+        useJSONSource: true,
+        wdaLocalPort: iosSimulator10WdaPort
       };
       caps[targetKey] = targetValue;
       await simpleCheck(caps, java8Port);
@@ -165,6 +165,7 @@ describe("Appium", function() {
         deviceName: 'iPhone 8',
         automationName: 'XCUITest',
         showXcodeLog: true,
+        useJSONSource: true,
         wdaLocalPort: iosSimulator11WdaPort
       };
       caps[targetKey] = targetValue;
@@ -187,6 +188,7 @@ describe("Appium", function() {
         udid: 'auto',
         automationName: 'XCUITest',
         showXcodeLog: true,
+        useJSONSource: true,
         xcodeSigningId: 'iPhone Developer',
         xcodeOrgId: process.env.APPLE_TEAM_ID_FOR_MAGIC_POD,
         wdaLocalPort: iosRealDeviceWdaPort
