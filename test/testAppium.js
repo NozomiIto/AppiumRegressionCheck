@@ -58,7 +58,28 @@ let killAppiumServer = (proc) => {
   }
 }
 
-let checkSourceXmlIsValid = async (xmlStr) => {
+let checkTakeScreenshotWorks = async (driver) => {
+  let retryCount = 10;
+  let image = null;
+  // Retry several times since sometimes screenshot fails (especially on iOS real device) due to the timing problem
+  for (var i = 0; i < retryCount; i++) {
+    try {
+      if (i > 0) {
+        console.log("try to take screen shot again");
+      }
+      image = await driver.takeScreenshot();
+      break;
+    } catch (e) {
+      console.log(e);
+      image = null;
+      await sleep(8000);
+    }
+  }
+  assert.isTrue(!!image); // not null nor empty
+}
+
+let checkSourceCommandWorks = async (driver) => {
+  let xmlStr = await driver.source();
   let parsed = await xml2js(xmlStr);
   // check that the tree has a certain depth
   let element1 = parsed[Object.keys(parsed)[0]];
@@ -68,21 +89,20 @@ let checkSourceXmlIsValid = async (xmlStr) => {
   assert.isTrue(!!element4); // not null
 }
 
-// finalizer: (driver) => {}. called before quitting the driver.
-let simpleCheck = async (caps, serverPort, finalizer = null) => {
+// beforeHook: (driver) => {}. Called just after the driver is launched.
+// afterHook: (driver) => {}. Called before quitting the driver.
+let simpleCheck = async (caps, serverPort, beforeHook = null, afterHook = null) => {
   let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', serverPort));
   try {
     await driver.init(caps);
 
-    // check page source method works without error
-    console.log("page source");
-    let xmlStr = await driver.source();
-    await checkSourceXmlIsValid(xmlStr);
-
-    // check taking screen shot works without error
+    if (beforeHook != null) {
+      await beforeHook(driver);
+    }
     console.log("screenshot");
-    let image = await driver.takeScreenshot();
-    assert.isTrue(!!image); // not null nor empty
+    await checkTakeScreenshotWorks(driver);
+    console.log("page source");
+    await checkSourceCommandWorks(driver);
 
     // try to click one of the elements if clickable
     console.log("find and click");
@@ -113,14 +133,12 @@ let simpleCheck = async (caps, serverPort, finalizer = null) => {
 
     // check page source method and taking screen shot again after several operations
     console.log("page source again");
-    xmlStr = await driver.source();
-    await checkSourceXmlIsValid(xmlStr);
+    await checkSourceCommandWorks(driver);
     console.log("screenshot again");
-    image = await driver.takeScreenshot();
-    assert.isTrue(!!image); // not null nor empty
+    await checkTakeScreenshotWorks(driver);
   } finally {
-    if (finalizer != null) {
-      await finalizer(driver);
+    if (afterHook != null) {
+      await afterHook(driver);
     }
     await driver.quit();
   }
@@ -210,12 +228,19 @@ describe("Appium", function() {
       if (targetValue.endsWith("AppiumRegressionTestApp.ipa")) {
         // to show the camera permission dialog which is displayed only for the initial launch
         caps["fullReset"] = true;
+        var beforeHook = async (driver) => {
+          // Check the app state mainly for the error debugging
+          let state = await driver.execute(
+            "mobile: queryAppState", {"bundleId": "com.trident-qa.AppiumRegressionTestApp"});
+          console.log(util.format("Current iOS app state is %s", state));
+        }
         // close the system dialog at the end of the test
-        var finalizer = async (driver) => { await driver.acceptAlert(); }
+        var afterHook = async (driver) => { await driver.acceptAlert(); }
       } else {
-        var finalizer = null;
+        var beforeHook = null;
+        var afterHook = null;
       }
-      await simpleCheck(caps, java8Port, finalizer);
+      await simpleCheck(caps, java8Port, beforeHook, afterHook);
     });
 
     // Android real device must be connected
