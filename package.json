@@ -18,5 +18,14 @@
   },
   "scripts": {
     "test": "mocha"
+  },
+  "devDependencies": {
+    "eslint": "3.x",
+    "babel-eslint": "7.x",
+    "eslint-config-appium": "^2.1.0",
+    "eslint-plugin-babel": "3.x",
+    "eslint-plugin-import": "2.x",
+    "eslint-plugin-mocha": "4.x",
+    "eslint-plugin-promise": "3.x"
   }
 }
