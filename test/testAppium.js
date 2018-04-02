@@ -11,6 +11,7 @@ const util = require("util");
 const childProcess = require("child_process");
 const teenProcess = require('teen_process');
 const xml2js = require('xml2js-es6-promise');
+const Promise = require('es6-promise').Promise;
 
 const appiumCmds = process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD ? ["node", process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD] : ["appium"];
 const testAppDir = __dirname + "/../test_app";
@@ -78,7 +79,7 @@ let launchAppiumServer = async (javaVersion, port) => {
   let args = appiumCmds.slice(1).concat(
     ["--log", logFileName, "--session-override", "--log-level", "debug", "--local-timezone", "--port", port]);
   let proc = childProcess.spawn(command, args);
-  proc.on('error', (err) => {
+  await proc.on('error', (err) => {
     console.log('Failed to start Appium server:' + err);
   });
   return proc;
@@ -181,19 +182,19 @@ describe("Appium", function () {
   let java8AppiumServer = null;
   let java9AppiumServer = null;
 
-  before(async () => {
+  before(async function () {
     java8AppiumServer = await launchAppiumServer("1.8", java8Port);
     java9AppiumServer = await launchAppiumServer("9", java9Port);
     await sleep(8000); // TODO smarter wait
   });
 
-  after(async () => {
+  after(async function () {
     killAppiumServer(java8AppiumServer);
     killAppiumServer(java9AppiumServer);
     await sleep(3000); // TODO smarter wait
   });
 
-  describe("simpleCheck", () => {
+  describe("simpleCheck", function () {
     forEach([
       ['app', testAppDir + "/TestApp.app"],
       ['bundleId', 'com.apple.Maps'],
@@ -291,8 +292,8 @@ describe("Appium", function () {
         });
   });
 
-  describe("moveTo action should work", () => {
-    it("on iOS", async() => {
+  describe("moveTo action should work", function () {
+    it("on iOS", async function () {
       let caps = iOS11SimulatorBaseCapabilities();
       caps.app = testAppDir + "/UICatalog.app";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
@@ -316,7 +317,7 @@ describe("Appium", function () {
       }
     });
 
-    it("on Android", async() => {
+    it("on Android", async function () {
       let caps = androidRealDeviceBaseCapabilities();
       caps.noReset = false; // reset app state
       caps.app = testAppDir + "/ApiDemos-debug.apk";
@@ -343,5 +344,4 @@ describe("Appium", function () {
       }
     });
   });
-
 });
