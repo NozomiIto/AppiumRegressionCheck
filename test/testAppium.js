@@ -1,3 +1,5 @@
+/* eslint no-console: 0*/
+
 'use strict';
 
 const chai = require("chai");
@@ -10,11 +12,7 @@ const childProcess = require("child_process");
 const teenProcess = require('teen_process');
 const xml2js = require('xml2js-es6-promise');
 
-if (process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD) {
-  var appiumCmds = ["node", process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD];
-} else {
-  var appiumCmds = ["appium"];
-}
+const appiumCmds = process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD ? ["node", process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD] : ["appium"];
 const testAppDir = __dirname + "/../test_app";
 const java8Port = 4723;
 const java9Port = 4724;
@@ -23,20 +21,20 @@ const iosSimulator10WdaPort = 8100;
 const iosSimulator11WdaPort = 8101;
 const iosRealDeviceWdaPort = 8102;
 
-let sleep = (milliSeconds) => {
+const sleep = (milliSeconds) => {
   return new Promise(resolve => setTimeout(resolve, milliSeconds));
-}
+};
 
-let getJavaHomeValue = async (versionStr) => {
+const getJavaHomeValue = async (versionStr) => {
   let javaHomeResult = await teenProcess.exec("/usr/libexec/java_home", ["-v", versionStr]);
   let stdOut = javaHomeResult.stdout;
   if (stdOut) {
     return stdOut.trim();
   }
   throw new Error(util.format("JAVA_HOME for % is not found", versionStr));
-}
+};
 
-let iOS10SimulatorBaseCapabilities = () => {
+const iOS10SimulatorBaseCapabilities = () => {
   let caps = {
     platformName: 'iOS',
     platformVersion: '10.3',
@@ -47,9 +45,9 @@ let iOS10SimulatorBaseCapabilities = () => {
     wdaLocalPort: iosSimulator10WdaPort
   };
   return caps;
-}
+};
 
-let iOS11SimulatorBaseCapabilities = () => {
+const iOS11SimulatorBaseCapabilities = () => {
   let caps = {
     platformName: 'iOS',
     platformVersion: '11.3',
@@ -60,21 +58,21 @@ let iOS11SimulatorBaseCapabilities = () => {
     wdaLocalPort: iosSimulator11WdaPort
   };
   return caps;
-}
+};
 
-let androidRealDeviceBaseCapabilities = () => {
+const androidRealDeviceBaseCapabilities = () => {
   let caps = {
     'platformName': 'Android',
     'deviceName': 'Android',
     'automationName': 'uiautomator2',
   };
   return caps;
-}
+};
 
 // returns: process object
 let launchAppiumServer = async (javaVersion, port) => {
-  process.env["JAVA_HOME"] = await getJavaHomeValue(javaVersion);
-  console.log(util.format("launch Appium server with JAVA_HOME=%s", process.env["JAVA_HOME"]));
+  process.env.JAVA_HOME = await getJavaHomeValue(javaVersion);
+  console.log(util.format("launch Appium server with JAVA_HOME=%s", process.env.JAVA_HOME));
   let command = appiumCmds[0];
   let logFileName = util.format("appiumServer_Java%s.log", javaVersion);
   let args = appiumCmds.slice(1).concat(
@@ -84,20 +82,20 @@ let launchAppiumServer = async (javaVersion, port) => {
     console.log('Failed to start Appium server:' + err);
   });
   return proc;
-}
+};
 
-let killAppiumServer = (proc) => {
+const killAppiumServer = (proc) => {
   console.log("kill Appium server");
   if (proc) {
     proc.kill();
   }
-}
+};
 
 let checkTakeScreenshotWorks = async (driver) => {
   let retryCount = 10;
   let image = null;
   // Retry several times since sometimes screenshot fails (especially on iOS real device) due to the timing problem
-  for (var i = 0; i < retryCount; i++) {
+  for (let i = 0; i < retryCount; i++) {
     try {
       if (i > 0) {
         console.log("try to take screen shot again");
@@ -111,7 +109,7 @@ let checkTakeScreenshotWorks = async (driver) => {
     }
   }
   assert.isTrue(!!image); // not null nor empty
-}
+};
 
 let checkSourceCommandWorks = async (driver) => {
   let xmlStr = await driver.source();
@@ -122,11 +120,11 @@ let checkSourceCommandWorks = async (driver) => {
   let element3 = element2[Object.keys(element2)[0]];
   let element4 = element3[Object.keys(element3)[0]];
   assert.isTrue(!!element4); // not null
-}
+};
 
 // beforeHook: (driver) => {}. Called just after the driver is launched.
 // afterHook: (driver) => {}. Called before quitting the driver.
-let simpleCheck = async (caps, serverPort, beforeHook = null, afterHook = null) => {
+const simpleCheck = async (caps, serverPort, beforeHook = null, afterHook = null) => {
   let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', serverPort));
   try {
     await driver.init(caps);
@@ -141,12 +139,9 @@ let simpleCheck = async (caps, serverPort, beforeHook = null, afterHook = null) 
 
     // try to click one of the elements if clickable
     console.log("find and click");
-    if (caps["platformName"] == "iOS") {
-      var targetClassName = "XCUIElementTypeOther";
-    } else {
-      var targetClassName = "android.widget.FrameLayout";
-    }
-    let element = await driver.elementByXPathOrNull(util.format("//%s[1]", targetClassName));
+    const targetClassName = caps.platformName === "iOS" ? "XCUIElementTypeOther" : "android.widget.FrameLayout";
+
+    const element = await driver.elementByXPathOrNull(util.format("//%s[1]", targetClassName));
     if (element == null) {
       console.log("no element is found");
     } else {
@@ -177,11 +172,11 @@ let simpleCheck = async (caps, serverPort, beforeHook = null, afterHook = null) 
     }
     await driver.quit();
   }
-}
+};
 
 // This test checks if the current Appium server and client combination works well.
 // You need to install command line Appium server preliminarily.
-describe("Appium", function() {
+describe("Appium", function () {
   this.timeout(3600000);  // mocha timeout
   let java8AppiumServer = null;
   let java9AppiumServer = null;
@@ -244,21 +239,22 @@ describe("Appium", function() {
         wdaLocalPort: iosRealDeviceWdaPort
       };
       caps[targetKey] = targetValue;
+
+      let beforeHook = null;
+      let afterHook = null;
+
       if (targetValue.endsWith("AppiumRegressionTestApp.ipa")) {
         // to show the camera permission dialog which is displayed only for the initial launch
-        caps["fullReset"] = true;
-        var beforeHook = async (driver) => {
+        caps.fullReset = true;
+        beforeHook = async (driver) => {
           // Check the app state mainly for the error debugging
-          let state = await driver.execute(
-            "mobile: queryAppState", {"bundleId": "com.trident-qa.AppiumRegressionTestApp"});
+          let state = await driver.execute("mobile: queryAppState", {"bundleId": "com.trident-qa.AppiumRegressionTestApp"});
           console.log(util.format("Current iOS app state is %s", state));
-        }
+        };
         // close the system dialog at the end of the test
-        var afterHook = async (driver) => { await driver.acceptAlert(); }
-      } else {
-        var beforeHook = null;
-        var afterHook = null;
+        afterHook = async (driver) => { await driver.acceptAlert(); };
       }
+
       await simpleCheck(caps, java8Port, beforeHook, afterHook);
     });
 
@@ -270,13 +266,13 @@ describe("Appium", function() {
     ])
     .it("should work with Android real device with Java8: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2) => {
-      let caps = androidRealDeviceBaseCapabilities();
-      caps[targetKey1] = targetValue1;
-      if (targetKey2) {
-        caps[targetKey2] = targetValue2;
-      };
-      await simpleCheck(caps, java8Port);
-    });
+          let caps = androidRealDeviceBaseCapabilities();
+          caps[targetKey1] = targetValue1;
+          if (targetKey2) {
+            caps[targetKey2] = targetValue2;
+          }
+          await simpleCheck(caps, java8Port);
+        });
 
     // Android real device must be connected
     forEach([
@@ -286,19 +282,19 @@ describe("Appium", function() {
     ])
     .it("should work with Android real device with Java9: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2) => {
-      let caps = androidRealDeviceBaseCapabilities();
-      caps[targetKey1] = targetValue1;
-      if (targetKey2) {
-        caps[targetKey2] = targetValue2;
-      };
-      await simpleCheck(caps, java9Port);
-    });
+          let caps = androidRealDeviceBaseCapabilities();
+          caps[targetKey1] = targetValue1;
+          if (targetKey2) {
+            caps[targetKey2] = targetValue2;
+          }
+          await simpleCheck(caps, java9Port);
+        });
   });
 
   describe("moveTo action should work", () => {
     it("on iOS", async() => {
       let caps = iOS11SimulatorBaseCapabilities();
-      caps["app"] = testAppDir + "/UICatalog.app";
+      caps.app = testAppDir + "/UICatalog.app";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
         await driver.init(caps);
@@ -322,8 +318,8 @@ describe("Appium", function() {
 
     it("on Android", async() => {
       let caps = androidRealDeviceBaseCapabilities();
-      caps["noReset"] = false; // reset app state
-      caps["app"] = testAppDir + "/ApiDemos-debug.apk";
+      caps.noReset = false; // reset app state
+      caps.app = testAppDir + "/ApiDemos-debug.apk";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
         await driver.init(caps);
