@@ -4,8 +4,8 @@
   "author": "TRIDENT Inc.",
   "private": true,
   "engines": {
-    "node": "7.9.0",
-    "npm": "5.4.2"
+    "node": "8.11.1",
+    "npm": "5.6.0"
   },
   "dependencies": {
     "chai": "^3.5.0",
