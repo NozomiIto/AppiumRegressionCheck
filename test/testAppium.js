@@ -192,7 +192,7 @@ describe("Appium", function() {
     .it("should work with iOS simulator 11: %s=%s", async (targetKey, targetValue) => {
       let caps = {
         platformName: 'iOS',
-        platformVersion: '11.2',
+        platformVersion: '11.3',
         deviceName: 'iPhone 8',
         automationName: 'XCUITest',
         showXcodeLog: true,
