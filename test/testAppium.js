@@ -297,7 +297,7 @@ describe("Appium", function() {
 
   describe("moveTo action should work", () => {
     it("on iOS", async() => {
-      let caps = iOS10SimulatorBaseCapabilities();
+      let caps = iOS11SimulatorBaseCapabilities();
       caps["app"] = testAppDir + "/UICatalog.app";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
@@ -306,7 +306,7 @@ describe("Appium", function() {
           console.log("scroll");
           // scroll happens only when moveTo handles its argument as the absolute position
           let action = new TouchAction(driver);
-          action.press({x: 100, y:100}).moveTo({x: 0, y: 0}).release();
+          action.press({x:200, y:200}).moveTo({x:200, y:0}).release();
           await driver.performTouchAction(action);
           await sleep(1000);
         }
@@ -333,7 +333,7 @@ describe("Appium", function() {
           console.log("scroll");
           // scroll happens only when moveTo handles its argument as the absolute position
           let action = new TouchAction(driver);
-          action.press({x: 100, y:100}).moveTo({x: 0, y: 0}).release();
+          action.press({x: 200, y:200}).moveTo({x:200, y:0}).release();
           await driver.performTouchAction(action);
           await sleep(1000);
         }
