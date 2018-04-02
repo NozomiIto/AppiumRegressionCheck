@@ -36,6 +36,41 @@ let getJavaHomeValue = async (versionStr) => {
   throw new Error(util.format("JAVA_HOME for % is not found", versionStr));
 }
 
+let iOS10SimulatorBaseCapabilities = () => {
+  let caps = {
+    platformName: 'iOS',
+    platformVersion: '10.3',
+    deviceName: 'iPhone 7',
+    automationName: 'XCUITest',
+    showXcodeLog: true,
+    useJSONSource: true, // more stable and faster
+    wdaLocalPort: iosSimulator10WdaPort
+  };
+  return caps;
+}
+
+let iOS11SimulatorBaseCapabilities = () => {
+  let caps = {
+    platformName: 'iOS',
+    platformVersion: '11.3',
+    deviceName: 'iPhone 8',
+    automationName: 'XCUITest',
+    showXcodeLog: true,
+    useJSONSource: true, // more stable and faster
+    wdaLocalPort: iosSimulator11WdaPort
+  };
+  return caps;
+}
+
+let androidRealDeviceBaseCapabilities = () => {
+  let caps = {
+    'platformName': 'Android',
+    'deviceName': 'Android',
+    'automationName': 'uiautomator2',
+  };
+  return caps;
+}
+
 // returns: process object
 let launchAppiumServer = async (javaVersion, port) => {
   process.env["JAVA_HOME"] = await getJavaHomeValue(javaVersion);
@@ -111,7 +146,7 @@ let simpleCheck = async (caps, serverPort, beforeHook = null, afterHook = null) 
     } else {
       var targetClassName = "android.widget.FrameLayout";
     }
-    let element = await driver.elementOrNull("xpath", util.format("//%s[1]", targetClassName));
+    let element = await driver.elementByXPathOrNull(util.format("//%s[1]", targetClassName));
     if (element == null) {
       console.log("no element is found");
     } else {
@@ -170,15 +205,7 @@ describe("Appium", function() {
       ['bundleId', 'com.apple.Preferences']
     ])
     .it("should work with iOS simulator 10: %s=%s", async (targetKey, targetValue) => {
-      let caps = {
-        platformName: 'iOS',
-        platformVersion: '10.3',
-        deviceName: 'iPhone 7',
-        automationName: 'XCUITest',
-        showXcodeLog: true,
-        useJSONSource: true, // more stable and faster
-        wdaLocalPort: iosSimulator10WdaPort
-      };
+      let caps = iOS10SimulatorBaseCapabilities();
       caps[targetKey] = targetValue;
       await simpleCheck(caps, java8Port);
     });
@@ -190,15 +217,7 @@ describe("Appium", function() {
       ['bundleId', 'com.apple.mobileslideshow']
     ])
     .it("should work with iOS simulator 11: %s=%s", async (targetKey, targetValue) => {
-      let caps = {
-        platformName: 'iOS',
-        platformVersion: '11.3',
-        deviceName: 'iPhone 8',
-        automationName: 'XCUITest',
-        showXcodeLog: true,
-        useJSONSource: true, // more stable and faster
-        wdaLocalPort: iosSimulator11WdaPort
-      };
+      let caps = iOS11SimulatorBaseCapabilities();
       caps[targetKey] = targetValue;
       await simpleCheck(caps, java8Port);
     });
@@ -251,11 +270,7 @@ describe("Appium", function() {
     ])
     .it("should work with Android real device with Java8: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2) => {
-      let caps = {
-        'platformName': 'Android',
-        'deviceName': 'Android',
-        'automationName': 'uiautomator2',
-      };
+      let caps = androidRealDeviceBaseCapabilities();
       caps[targetKey1] = targetValue1;
       if (targetKey2) {
         caps[targetKey2] = targetValue2;
@@ -271,11 +286,7 @@ describe("Appium", function() {
     ])
     .it("should work with Android real device with Java9: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2) => {
-      let caps = {
-        'platformName': 'Android',
-        'deviceName': 'Android',
-        'automationName': 'uiautomator2',
-      };
+      let caps = androidRealDeviceBaseCapabilities();
       caps[targetKey1] = targetValue1;
       if (targetKey2) {
         caps[targetKey2] = targetValue2;
@@ -283,4 +294,58 @@ describe("Appium", function() {
       await simpleCheck(caps, java9Port);
     });
   });
+
+  describe("moveTo action should work", () => {
+    it("on iOS", async() => {
+      let caps = iOS10SimulatorBaseCapabilities();
+      caps["app"] = testAppDir + "/UICatalog.app";
+      let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
+      try {
+        await driver.init(caps);
+        for (let i = 0; i < 5; i++) {
+          console.log("scroll");
+          // scroll happens only when moveTo handles its argument as the absolute position
+          let action = new TouchAction(driver);
+          action.press({x: 100, y:100}).moveTo({x: 0, y: 0}).release();
+          await driver.performTouchAction(action);
+          await sleep(1000);
+        }
+        // assert the scroll was actually happened
+        // and "Toolbars" line, which occurs only when the page is scrolled, can be clicked
+        let toolbars = await driver.elementById("Toolbars");
+        await toolbars.click();
+        await driver.elementById("Tinted");
+      } finally {
+        await driver.quit();
+      }
+    });
+
+    it("on Android", async() => {
+      let caps = androidRealDeviceBaseCapabilities();
+      caps["noReset"] = false; // reset app state
+      caps["app"] = testAppDir + "/ApiDemos-debug.apk";
+      let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
+      try {
+        await driver.init(caps);
+        let graphics = await driver.elementByXPath("//android.widget.TextView[@content-desc='Graphics']");
+        await graphics.click();
+        for (let i = 0; i < 5; i++) {
+          console.log("scroll");
+          // scroll happens only when moveTo handles its argument as the absolute position
+          let action = new TouchAction(driver);
+          action.press({x: 100, y:100}).moveTo({x: 0, y: 0}).release();
+          await driver.performTouchAction(action);
+          await sleep(1000);
+        }
+        // assert the scroll was actually happened
+        // and "Xfermodes" line, which occurs only when the page is scrolled, can be clicked
+        let xfermodes = await driver.elementByXPath("//android.widget.TextView[@content-desc='Xfermodes']");
+        await xfermodes.click();
+        await driver.elementById("//android.widget.TextView[@text='Graphics/Xfermodes']");
+      } finally {
+        await driver.quit();
+      }
+    });
+  });
+
 });
