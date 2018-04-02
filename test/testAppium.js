@@ -11,7 +11,6 @@ const util = require("util");
 const childProcess = require("child_process");
 const teenProcess = require('teen_process');
 const xml2js = require('xml2js-es6-promise');
-const Promise = require('es6-promise').Promise;
 
 const appiumCmds = process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD ? ["node", process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD] : ["appium"];
 const testAppDir = __dirname + "/../test_app";
@@ -35,39 +34,30 @@ const getJavaHomeValue = async (versionStr) => {
   throw new Error(util.format("JAVA_HOME for % is not found", versionStr));
 };
 
-const iOS10SimulatorBaseCapabilities = () => {
-  let caps = {
-    platformName: 'iOS',
-    platformVersion: '10.3',
-    deviceName: 'iPhone 7',
-    automationName: 'XCUITest',
-    showXcodeLog: true,
-    useJSONSource: true, // more stable and faster
-    wdaLocalPort: iosSimulator10WdaPort
-  };
-  return caps;
+const iOS10SimulatorBaseCapabilities = {
+  platformName: 'iOS',
+  platformVersion: '10.3',
+  deviceName: 'iPhone 7',
+  automationName: 'XCUITest',
+  showXcodeLog: true,
+  useJSONSource: true, // more stable and faster
+  wdaLocalPort: iosSimulator10WdaPort
 };
 
-const iOS11SimulatorBaseCapabilities = () => {
-  let caps = {
-    platformName: 'iOS',
-    platformVersion: '11.3',
-    deviceName: 'iPhone 8',
-    automationName: 'XCUITest',
-    showXcodeLog: true,
-    useJSONSource: true, // more stable and faster
-    wdaLocalPort: iosSimulator11WdaPort
-  };
-  return caps;
+const iOS11SimulatorBaseCapabilities = {
+  platformName: 'iOS',
+  platformVersion: '11.3',
+  deviceName: 'iPhone 8',
+  automationName: 'XCUITest',
+  showXcodeLog: true,
+  useJSONSource: true, // more stable and faster
+  wdaLocalPort: iosSimulator11WdaPort
 };
 
-const androidRealDeviceBaseCapabilities = () => {
-  let caps = {
-    'platformName': 'Android',
-    'deviceName': 'Android',
-    'automationName': 'uiautomator2',
-  };
-  return caps;
+const androidRealDeviceBaseCapabilities = {
+  'platformName': 'Android',
+  'deviceName': 'Android',
+  'automationName': 'uiautomator2',
 };
 
 // returns: process object
@@ -201,7 +191,7 @@ describe("Appium", function () {
       ['bundleId', 'com.apple.Preferences']
     ])
     .it("should work with iOS simulator 10: %s=%s", async (targetKey, targetValue) => {
-      let caps = iOS10SimulatorBaseCapabilities();
+      let caps = iOS10SimulatorBaseCapabilities;
       caps[targetKey] = targetValue;
       await simpleCheck(caps, java8Port);
     });
@@ -213,7 +203,7 @@ describe("Appium", function () {
       ['bundleId', 'com.apple.mobileslideshow']
     ])
     .it("should work with iOS simulator 11: %s=%s", async (targetKey, targetValue) => {
-      let caps = iOS11SimulatorBaseCapabilities();
+      let caps = iOS11SimulatorBaseCapabilities;
       caps[targetKey] = targetValue;
       await simpleCheck(caps, java8Port);
     });
@@ -267,7 +257,7 @@ describe("Appium", function () {
     ])
     .it("should work with Android real device with Java8: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2) => {
-          let caps = androidRealDeviceBaseCapabilities();
+          let caps = androidRealDeviceBaseCapabilities;
           caps[targetKey1] = targetValue1;
           if (targetKey2) {
             caps[targetKey2] = targetValue2;
@@ -283,7 +273,7 @@ describe("Appium", function () {
     ])
     .it("should work with Android real device with Java9: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2) => {
-          let caps = androidRealDeviceBaseCapabilities();
+          let caps = androidRealDeviceBaseCapabilities;
           caps[targetKey1] = targetValue1;
           if (targetKey2) {
             caps[targetKey2] = targetValue2;
@@ -294,7 +284,7 @@ describe("Appium", function () {
 
   describe("moveTo action should work", function () {
     it("on iOS", async function () {
-      let caps = iOS11SimulatorBaseCapabilities();
+      let caps = iOS11SimulatorBaseCapabilities;
       caps.app = testAppDir + "/UICatalog.app";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
@@ -318,7 +308,7 @@ describe("Appium", function () {
     });
 
     it("on Android", async function () {
-      let caps = androidRealDeviceBaseCapabilities();
+      let caps = androidRealDeviceBaseCapabilities;
       caps.noReset = false; // reset app state
       caps.app = testAppDir + "/ApiDemos-debug.apk";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
