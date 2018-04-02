@@ -320,7 +320,7 @@ describe("Appium", function () {
           console.log("scroll");
           // scroll happens only when moveTo handles its argument as the absolute position
           let action = new TouchAction(driver);
-          action.press({x: 200, y:200}).moveTo({x:200, y:0}).release();
+          action.press({x: 200, y:200}).wait({ms: 500}).moveTo({x:200, y:0}).release();
           await driver.performTouchAction(action);
           await sleep(1000);
         }
