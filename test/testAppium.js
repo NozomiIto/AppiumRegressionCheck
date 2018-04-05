@@ -69,7 +69,7 @@ let launchAppiumServer = async (javaVersion, port) => {
   let args = appiumCmds.slice(1).concat(
     ["--log", logFileName, "--session-override", "--log-level", "debug", "--local-timezone", "--port", port]);
   let proc = childProcess.spawn(command, args);
-  await proc.on('error', (err) => {
+  proc.on('error', (err) => {
     console.log('Failed to start Appium server:' + err);
   });
   return proc;
