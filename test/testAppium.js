@@ -10,6 +10,7 @@ const TouchAction = wd.TouchAction;
 const util = require("util");
 const childProcess = require("child_process");
 const teenProcess = require('teen_process');
+const requestPromise = require("request-promise");
 const xml2js = require('xml2js-es6-promise');
 
 const appiumCmds = process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD ? ["node", process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD] : ["appium"];
@@ -52,6 +53,19 @@ const iOS11SimulatorBaseCapabilities = {
   showXcodeLog: true,
   useJSONSource: true, // more stable and faster
   wdaLocalPort: iosSimulator11WdaPort
+};
+
+const iOSRealDeviceBaseCapabilities = {
+  platformName: 'iOS',
+  platformVersion: '10.3', // dummy
+  deviceName: 'iPhone 5', // dummy
+  udid: 'auto',
+  automationName: 'XCUITest',
+  showXcodeLog: true,
+  useJSONSource: true, // more stable and faster
+  xcodeSigningId: 'iPhone Developer',
+  xcodeOrgId: process.env.APPLE_TEAM_ID_FOR_MAGIC_POD,
+  wdaLocalPort: iosRealDeviceWdaPort
 };
 
 const androidRealDeviceBaseCapabilities = {
@@ -217,18 +231,7 @@ describe("Appium", function () {
       ['bundleId', 'com.apple.Health']
     ])
     .it("should work with iOS real device: %s=%s", async (targetKey, targetValue) => {
-      let caps = {
-        platformName: 'iOS',
-        platformVersion: '10.3', // dummy
-        deviceName: 'iPhone 5', // dummy
-        udid: 'auto',
-        automationName: 'XCUITest',
-        showXcodeLog: true,
-        useJSONSource: true, // more stable and faster
-        xcodeSigningId: 'iPhone Developer',
-        xcodeOrgId: process.env.APPLE_TEAM_ID_FOR_MAGIC_POD,
-        wdaLocalPort: iosRealDeviceWdaPort
-      };
+      let caps = iOSRealDeviceBaseCapabilities;
       caps[targetKey] = targetValue;
 
       let beforeHook = null;
@@ -280,6 +283,41 @@ describe("Appium", function () {
           }
           await simpleCheck(caps, java9Port);
         });
+  });
+
+  describe("WDA session-less command should work", function() {
+  　let sessionLessCommandCheck = async function(caps) {
+      let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
+      try {
+        await driver.init(caps);
+        let sourceOpt = {
+          method: 'GET',
+          url: util.format("http://localhost:%d/source", iosSimulator11WdaPort)
+        }
+        let sourceBody = await requestPromise(sourceOpt);
+        assert.isTrue(!!sourceBody); // not null
+        let screenshotOpt = {
+          method: 'GET',
+          url: util.format("http://localhost:%d/screenshot", iosSimulator11WdaPort)
+        }
+        let screenshotBody = await requestPromise(screenshotOpt);
+        assert.isTrue(!!screenshotBody); // not null
+      } finally {
+        await driver.quit();
+      }
+    }
+
+    it("on iOS simulator11", async function() {
+      let caps = iOS11SimulatorBaseCapabilities;
+      caps.app = testAppDir + "/TestApp.app";
+      await sessionLessCommandCheck(caps);
+    });
+
+    it("on iOS real device", async function() {
+      let caps = iOSRealDeviceBaseCapabilities;
+      caps.app = testAppDir + "/TestApp.ipa";
+      await sessionLessCommandCheck(caps);
+    });
   });
 
   describe("moveTo action should work", function () {
