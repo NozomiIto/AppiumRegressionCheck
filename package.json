@@ -18,6 +18,7 @@
     "xml2js-es6-promise": "^1.1.1"
   },
   "scripts": {
+    "lint": "node node_modules/eslint/bin/eslint.js .",
     "test": "mocha"
   },
   "devDependencies": {
