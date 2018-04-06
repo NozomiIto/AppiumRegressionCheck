@@ -285,35 +285,35 @@ describe("Appium", function () {
         });
   });
 
-  describe("WDA session-less command should work", function() {
-  　let sessionLessCommandCheck = async function(caps) {
+  describe("WDA session-less command should work", function () {
+    let sessionLessCommandCheck = async (caps) => {
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
         await driver.init(caps);
         let sourceOpt = {
           method: 'GET',
           url: util.format("http://localhost:%d/source", iosSimulator11WdaPort)
-        }
+        };
         let sourceBody = await requestPromise(sourceOpt);
         assert.isTrue(!!sourceBody); // not null
         let screenshotOpt = {
           method: 'GET',
           url: util.format("http://localhost:%d/screenshot", iosSimulator11WdaPort)
-        }
+        };
         let screenshotBody = await requestPromise(screenshotOpt);
         assert.isTrue(!!screenshotBody); // not null
       } finally {
         await driver.quit();
       }
-    }
+    };
 
-    it("on iOS simulator11", async function() {
+    it("on iOS simulator11", async function () {
       let caps = iOS11SimulatorBaseCapabilities;
       caps.app = testAppDir + "/TestApp.app";
       await sessionLessCommandCheck(caps);
     });
 
-    it("on iOS real device", async function() {
+    it("on iOS real device", async function () {
       let caps = iOSRealDeviceBaseCapabilities;
       caps.app = testAppDir + "/TestApp.ipa";
       await sessionLessCommandCheck(caps);
