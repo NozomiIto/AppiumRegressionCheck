@@ -22,44 +22,52 @@ const iosSimulator10WdaPort = 8100;
 const iosSimulator11WdaPort = 8101;
 const iosRealDeviceWdaPort = 8102;
 
-const iOS10SimulatorBaseCapabilities = {
-  platformName: 'iOS',
-  platformVersion: '10.3',
-  deviceName: 'iPhone 7',
-  automationName: 'XCUITest',
-  showXcodeLog: true,
-  useJSONSource: true, // more stable and faster
-  wdaLocalPort: iosSimulator10WdaPort
-};
+function iOS10SimulatorBaseCapabilities () {
+  return {
+    platformName: 'iOS',
+    platformVersion: '10.3',
+    deviceName: 'iPhone 7',
+    automationName: 'XCUITest',
+    showXcodeLog: true,
+    useJSONSource: true, // more stable and faster
+    wdaLocalPort: iosSimulator10WdaPort
+  };
+}
 
-const iOS11SimulatorBaseCapabilities = {
-  platformName: 'iOS',
-  platformVersion: '11.3',
-  deviceName: 'iPhone 8',
-  automationName: 'XCUITest',
-  showXcodeLog: true,
-  useJSONSource: true, // more stable and faster
-  wdaLocalPort: iosSimulator11WdaPort
-};
+function iOS11SimulatorBaseCapabilities () {
+  return {
+    platformName: 'iOS',
+    platformVersion: '11.3',
+    deviceName: 'iPhone 8',
+    automationName: 'XCUITest',
+    showXcodeLog: true,
+    useJSONSource: true, // more stable and faster
+    wdaLocalPort: iosSimulator11WdaPort
+  };
+}
 
-const iOSRealDeviceBaseCapabilities = {
-  platformName: 'iOS',
-  platformVersion: '10.3', // dummy
-  deviceName: 'iPhone 5', // dummy
-  udid: 'auto',
-  automationName: 'XCUITest',
-  showXcodeLog: true,
-  useJSONSource: true, // more stable and faster
-  xcodeSigningId: 'iPhone Developer',
-  xcodeOrgId: process.env.APPLE_TEAM_ID_FOR_MAGIC_POD,
-  wdaLocalPort: iosRealDeviceWdaPort
-};
+function iOSRealDeviceBaseCapabilities () {
+  return {
+    platformName: 'iOS',
+    platformVersion: '10.3', // dummy
+    deviceName: 'iPhone 5', // dummy
+    udid: 'auto',
+    automationName: 'XCUITest',
+    showXcodeLog: true,
+    useJSONSource: true, // more stable and faster
+    xcodeSigningId: 'iPhone Developer',
+    xcodeOrgId: process.env.APPLE_TEAM_ID_FOR_MAGIC_POD,
+    wdaLocalPort: iosRealDeviceWdaPort
+  };
+}
 
-const androidRealDeviceBaseCapabilities = {
-  'platformName': 'Android',
-  'deviceName': 'Android',
-  'automationName': 'uiautomator2',
-};
+function androidRealDeviceBaseCapabilities () {
+  return {
+    'platformName': 'Android',
+    'deviceName': 'Android',
+    'automationName': 'uiautomator2',
+  };
+}
 
 function sleep (milliSeconds) {
   return new Promise(resolve => setTimeout(resolve, milliSeconds));
@@ -256,7 +264,7 @@ describe("Appium", function () {
       ['bundleId', 'com.apple.Preferences']
     ])
     .it("should work with iOS simulator 10: %s=%s", async (targetKey, targetValue) => {
-      let caps = iOS10SimulatorBaseCapabilities;
+      let caps = iOS10SimulatorBaseCapabilities();
       caps[targetKey] = targetValue;
       await simpleCheck(caps, java8Port);
     });
@@ -268,7 +276,7 @@ describe("Appium", function () {
       ['bundleId', 'com.apple.mobileslideshow']
     ])
     .it("should work with iOS simulator 11: %s=%s", async (targetKey, targetValue) => {
-      let caps = iOS11SimulatorBaseCapabilities;
+      let caps = iOS11SimulatorBaseCapabilities();
       caps[targetKey] = targetValue;
       await simpleCheck(caps, java8Port);
     });
@@ -279,7 +287,7 @@ describe("Appium", function () {
       ['bundleId', 'com.apple.Health']
     ])
     .it("should work with iOS real device: %s=%s", async (targetKey, targetValue) => {
-      let caps = iOSRealDeviceBaseCapabilities;
+      let caps = iOSRealDeviceBaseCapabilities();
       caps[targetKey] = targetValue;
       await simpleCheck(caps, java8Port);
     });
@@ -292,7 +300,7 @@ describe("Appium", function () {
     ])
     .it("should work with Android real device with Java8: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2) => {
-          let caps = androidRealDeviceBaseCapabilities;
+          let caps = androidRealDeviceBaseCapabilities();
           caps[targetKey1] = targetValue1;
           if (targetKey2) {
             caps[targetKey2] = targetValue2;
@@ -307,7 +315,7 @@ describe("Appium", function () {
     ])
     .it("should work with Android real device with Java9: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2) => {
-          let caps = androidRealDeviceBaseCapabilities;
+          let caps = androidRealDeviceBaseCapabilities();
           caps[targetKey1] = targetValue1;
           if (targetKey2) {
             caps[targetKey2] = targetValue2;
@@ -318,14 +326,14 @@ describe("Appium", function () {
 
   describe("iOS screenshot and source should work in various situation", function () {
     it("on iOS simulator11", async function () {
-      let caps = iOS11SimulatorBaseCapabilities;
+      let caps = iOS11SimulatorBaseCapabilities();
       caps.app = testAppDir + "/AppiumRegressionTestApp.app";
       caps.fullReset = true;
       await iOSAppiumRegressionTestAppCheck(caps, iosSimulator11WdaPort);
     });
 
     it("on iOS real device", async function () {
-      let caps = iOSRealDeviceBaseCapabilities;
+      let caps = iOSRealDeviceBaseCapabilities();
       caps.app = testAppDir + "/AppiumRegressionTestApp.ipa";
       caps.fullReset = true;
       await iOSAppiumRegressionTestAppCheck(caps, iosRealDeviceWdaPort);
@@ -334,7 +342,7 @@ describe("Appium", function () {
 
   describe("moveTo action should work", function () {
     it("on iOS", async function () {
-      let caps = iOS11SimulatorBaseCapabilities;
+      let caps = iOS11SimulatorBaseCapabilities();
       caps.app = testAppDir + "/UICatalog.app";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
@@ -358,7 +366,7 @@ describe("Appium", function () {
     });
 
     it("on Android", async function () {
-      let caps = androidRealDeviceBaseCapabilities;
+      let caps = androidRealDeviceBaseCapabilities();
       caps.noReset = false; // reset app state
       caps.app = testAppDir + "/ApiDemos-debug.apk";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
