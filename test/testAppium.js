@@ -207,21 +207,27 @@ async function iOSAppiumRegressionTestAppCheck (caps, wdaPort) {
   try {
     await driver.init(caps);
 
-    console.log("screenshot");
+    console.log("screenshot for system alert");
     await checkScreenshotWorks(driver);
-    console.log("page source");
+    console.log("page source for system alert");
     await checkSourceWorks(driver);
-    console.log("session-less screenshot");
+    console.log("session-less screenshot for system alert");
     await checkSessionLessScreenshotWorks(driver, wdaPort);
-    console.log("session-less source");
+    console.log("session-less source for system alert");
     await checkSessionLessSourceWorks(driver, wdaPort);
 
     await driver.acceptAlert(); // currently the alert must be displayed
 
-    // session-less command check for no alert page
-    console.log("session-less screenshot");
+    console.log("session-less screenshot for normal page");
     await checkSessionLessScreenshotWorks(driver, wdaPort);
-    console.log("session-less source");
+    console.log("session-less source for normal page");
+    await checkSessionLessSourceWorks(driver, wdaPort);
+
+    await driver.closeApp();
+
+    console.log("session-less screenshot for home");
+    await checkSessionLessScreenshotWorks(driver, wdaPort);
+    console.log("session-less source for home");
     await checkSessionLessSourceWorks(driver, wdaPort);
   } finally {
     try {
