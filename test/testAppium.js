@@ -96,27 +96,21 @@ function killAppiumServer (proc) {
   }
 }
 
-async function checkTakeScreenshotWorks (driver) {
-  let retryCount = 10;
-  let image = null;
-  // Retry several times since sometimes screenshot fails (especially on iOS real device) due to the timing problem
-  for (let i = 0; i < retryCount; i++) {
-    try {
-      if (i > 0) {
-        console.log("try to take screen shot again");
-      }
-      image = await driver.takeScreenshot();
-      break;
-    } catch (e) {
-      console.log(e);
-      image = null;
-      await sleep(8000);
-    }
-  }
+async function checkScreenshotWorks (driver) {
+  let image = await driver.takeScreenshot();
   assert.isTrue(!!image); // not null nor empty
 }
 
-async function checkSourceCommandWorks (driver) {
+async function checkSessionLessScreenshotWorks (driver, wdaPort) {
+  let opt = {
+    method: 'GET',
+    url: util.format("http://localhost:%d/screenshot", wdaPort)
+  };
+  let body = await requestPromise(opt);
+  assert.isTrue(!!body); // not null
+}
+
+async function checkSourceWorks (driver) {
   let xmlStr = await driver.source();
   let parsed = await xml2js(xmlStr);
   // check that the tree has a certain depth
@@ -127,20 +121,38 @@ async function checkSourceCommandWorks (driver) {
   assert.isTrue(!!element4); // not null
 }
 
-// beforeHook: (driver) => {}. Called just after the driver is launched.
-// afterHook: (driver) => {}. Called before quitting the driver.
-async function simpleCheck (caps, serverPort, beforeHook = null, afterHook = null) {
+async function checkSessionLessSourceWorks (driver, wdaPort) {
+  let opt = {
+    method: 'GET',
+    url: util.format("http://localhost:%d/source", wdaPort)
+  };
+  let result = await requestPromise(opt);
+  let xmlStr = JSON.parse(result).value;
+  try {
+    let parsed = await xml2js(xmlStr);
+    // check that the tree has a certain depth
+    let element1 = parsed[Object.keys(parsed)[0]];
+    let element2 = element1[Object.keys(element1)[0]];
+    let element3 = element2[Object.keys(element2)[0]];
+    let element4 = element3[Object.keys(element3)[0]];
+    assert.isTrue(!!element4); // not null
+  } catch (e) {
+    console.log(e);
+    console.log("invalid source XML");
+    console.log(xmlStr);
+    throw e;
+  }
+}
+
+async function simpleCheck (caps, serverPort) {
   let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', serverPort));
   try {
     await driver.init(caps);
 
-    if (beforeHook != null) {
-      await beforeHook(driver);
-    }
     console.log("screenshot");
-    await checkTakeScreenshotWorks(driver);
+    await checkScreenshotWorks(driver);
     console.log("page source");
-    await checkSourceCommandWorks(driver);
+    await checkSourceWorks(driver);
 
     // try to click one of the elements if clickable
     console.log("find and click");
@@ -166,14 +178,44 @@ async function simpleCheck (caps, serverPort, beforeHook = null, afterHook = nul
     // await driver.setOrientation("LANDSCAPE");
     // await driver.setOrientation("PORTRAIT");
 
-    // check page source method and taking screen shot again after several operations
-    console.log("page source again");
-    await checkSourceCommandWorks(driver);
+    // check taking screen shot and page source command again after several operations
     console.log("screenshot again");
-    await checkTakeScreenshotWorks(driver);
+    await checkScreenshotWorks(driver);
+    console.log("page source again");
+    await checkSourceWorks(driver);
   } finally {
-    if (afterHook != null) {
-      await afterHook(driver);
+    await driver.quit();
+  }
+}
+
+async function iOSAppiumRegressionTestAppCheck (caps, wdaPort) {
+  assert.isTrue(caps.app.includes("AppiumRegressionTestApp"));
+  assert.isTrue(caps.fullReset);
+  let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
+  try {
+    await driver.init(caps);
+
+    console.log("screenshot");
+    await checkScreenshotWorks(driver);
+    console.log("page source");
+    await checkSourceWorks(driver);
+    console.log("session-less screenshot");
+    await checkSessionLessScreenshotWorks(driver, wdaPort);
+    console.log("session-less source");
+    await checkSessionLessSourceWorks(driver, wdaPort);
+
+    await driver.acceptAlert(); // currently the alert must be displayed
+
+    // session-less command check for no alert page
+    console.log("session-less screenshot");
+    await checkSessionLessScreenshotWorks(driver, wdaPort);
+    console.log("session-less source");
+    await checkSessionLessSourceWorks(driver, wdaPort);
+  } finally {
+    try {
+      await driver.acceptAlert(); // try to close in case acceptAlert is not called
+    } catch (e) {
+      // ignore
     }
     await driver.quit();
   }
@@ -181,6 +223,7 @@ async function simpleCheck (caps, serverPort, beforeHook = null, afterHook = nul
 
 // This test checks if the current Appium server and client combination works well.
 // You need to install command line Appium server preliminarily.
+// - For iOS real device test, APPLE_TEAM_ID_FOR_MAGIC_POD environment variable must be set
 describe("Appium", function () {
   this.timeout(3600000);  // mocha timeout
   let java8AppiumServer = null;
@@ -189,7 +232,7 @@ describe("Appium", function () {
   before(async function () {
     java8AppiumServer = await launchAppiumServer("1.8", java8Port);
     java9AppiumServer = await launchAppiumServer("9", java9Port);
-    await sleep(8000); // TODO smarter wait
+    await sleep(10000); // TODO smarter wait
   });
 
   after(async function () {
@@ -222,10 +265,7 @@ describe("Appium", function () {
       await simpleCheck(caps, java8Port);
     });
 
-    // - iOS real device must be connected
-    // - APPLE_TEAM_ID_FOR_MAGIC_POD environment variable must be set
     forEach([
-      ['app', testAppDir + "/AppiumRegressionTestApp.ipa"],
       ['app', testAppDir + "/TestApp.ipa"],
       ['bundleId', 'com.apple.camera'],
       ['bundleId', 'com.apple.Health']
@@ -233,23 +273,7 @@ describe("Appium", function () {
     .it("should work with iOS real device: %s=%s", async (targetKey, targetValue) => {
       let caps = iOSRealDeviceBaseCapabilities;
       caps[targetKey] = targetValue;
-
-      let beforeHook = null;
-      let afterHook = null;
-
-      if (targetValue.endsWith("AppiumRegressionTestApp.ipa")) {
-        // to show the camera permission dialog which is displayed only for the initial launch
-        caps.fullReset = true;
-        beforeHook = async (driver) => {
-          // Check the app state mainly for the error debugging
-          let state = await driver.execute("mobile: queryAppState", {"bundleId": "com.trident-qa.AppiumRegressionTestApp"});
-          console.log(util.format("Current iOS app state is %s", state));
-        };
-        // close the system dialog at the end of the test
-        afterHook = async (driver) => { await driver.acceptAlert(); };
-      }
-
-      await simpleCheck(caps, java8Port, beforeHook, afterHook);
+      await simpleCheck(caps, java8Port);
     });
 
     // Android real device must be connected
@@ -268,7 +292,6 @@ describe("Appium", function () {
           await simpleCheck(caps, java8Port);
         });
 
-    // Android real device must be connected
     forEach([
       ['app', testAppDir + "/ApiDemos-debug.apk", null, null],
       // assume following apps have been installed
@@ -285,38 +308,19 @@ describe("Appium", function () {
         });
   });
 
-  describe("WDA session-less command should work", function () {
-    let sessionLessCommandCheck = async (caps) => {
-      let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
-      try {
-        await driver.init(caps);
-        let sourceOpt = {
-          method: 'GET',
-          url: util.format("http://localhost:%d/source", iosSimulator11WdaPort)
-        };
-        let sourceBody = await requestPromise(sourceOpt);
-        assert.isTrue(!!sourceBody); // not null
-        let screenshotOpt = {
-          method: 'GET',
-          url: util.format("http://localhost:%d/screenshot", iosSimulator11WdaPort)
-        };
-        let screenshotBody = await requestPromise(screenshotOpt);
-        assert.isTrue(!!screenshotBody); // not null
-      } finally {
-        await driver.quit();
-      }
-    };
-
+  describe("iOS screenshot and source should work in various situation", function () {
     it("on iOS simulator11", async function () {
       let caps = iOS11SimulatorBaseCapabilities;
-      caps.app = testAppDir + "/TestApp.app";
-      await sessionLessCommandCheck(caps);
+      caps.app = testAppDir + "/AppiumRegressionTestApp.app";
+      caps.fullReset = true;
+      await iOSAppiumRegressionTestAppCheck(caps, iosSimulator11WdaPort);
     });
 
     it("on iOS real device", async function () {
       let caps = iOSRealDeviceBaseCapabilities;
-      caps.app = testAppDir + "/TestApp.ipa";
-      await sessionLessCommandCheck(caps);
+      caps.app = testAppDir + "/AppiumRegressionTestApp.ipa";
+      caps.fullReset = true;
+      await iOSAppiumRegressionTestAppCheck(caps, iosRealDeviceWdaPort);
     });
   });
 
