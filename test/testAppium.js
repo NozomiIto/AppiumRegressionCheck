@@ -184,7 +184,11 @@ async function simpleCheck (caps, serverPort) {
     console.log("page source again");
     await checkSourceWorks(driver);
   } finally {
-    await driver.quit();
+    try {
+      await driver.quit();
+    } catch (e) {
+      console.log(e); // ignore
+    }
   }
 }
 
@@ -217,7 +221,11 @@ async function iOSAppiumRegressionTestAppCheck (caps, wdaPort) {
     } catch (e) {
       // ignore
     }
-    await driver.quit();
+    try {
+      await driver.quit();
+    } catch (e) {
+      console.log(e); // ignore
+    }
   }
 }
 
