@@ -18,9 +18,8 @@ const testAppDir = __dirname + "/../test_app";
 const java8Port = 4723;
 const java9Port = 4724;
 // use different ports to avoid the mixed communication with other iOS devices
-const iosSimulator10WdaPort = 8100;
-const iosSimulator11WdaPort = 8101;
-const iosRealDeviceWdaPort = 8102;
+const iosSimulatorWdaPort = 8100;
+const iosRealDeviceWdaPort = 8101;
 
 function iOS10SimulatorBaseCapabilities () {
   return {
@@ -30,7 +29,7 @@ function iOS10SimulatorBaseCapabilities () {
     automationName: 'XCUITest',
     showXcodeLog: true,
     useJSONSource: true, // more stable and faster
-    wdaLocalPort: iosSimulator10WdaPort
+    wdaLocalPort: iosSimulatorWdaPort
   };
 }
 
@@ -42,7 +41,7 @@ function iOS11SimulatorBaseCapabilities () {
     automationName: 'XCUITest',
     showXcodeLog: true,
     useJSONSource: true, // more stable and faster
-    wdaLocalPort: iosSimulator11WdaPort
+    wdaLocalPort: iosSimulatorWdaPort
   };
 }
 
@@ -335,7 +334,7 @@ describe("Appium", function () {
       let caps = iOS11SimulatorBaseCapabilities();
       caps.app = testAppDir + "/AppiumRegressionTestApp.app";
       caps.fullReset = true;
-      await iOSAppiumRegressionTestAppCheck(caps, iosSimulator11WdaPort);
+      await iOSAppiumRegressionTestAppCheck(caps, iosSimulatorWdaPort);
     });
 
     it("on iOS real device", async function () {
