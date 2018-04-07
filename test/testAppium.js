@@ -22,19 +22,6 @@ const iosSimulator10WdaPort = 8100;
 const iosSimulator11WdaPort = 8101;
 const iosRealDeviceWdaPort = 8102;
 
-const sleep = (milliSeconds) => {
-  return new Promise(resolve => setTimeout(resolve, milliSeconds));
-};
-
-const getJavaHomeValue = async (versionStr) => {
-  let javaHomeResult = await teenProcess.exec("/usr/libexec/java_home", ["-v", versionStr]);
-  let stdOut = javaHomeResult.stdout;
-  if (stdOut) {
-    return stdOut.trim();
-  }
-  throw new Error(util.format("JAVA_HOME for % is not found", versionStr));
-};
-
 const iOS10SimulatorBaseCapabilities = {
   platformName: 'iOS',
   platformVersion: '10.3',
@@ -74,8 +61,21 @@ const androidRealDeviceBaseCapabilities = {
   'automationName': 'uiautomator2',
 };
 
+function sleep (milliSeconds) {
+  return new Promise(resolve => setTimeout(resolve, milliSeconds));
+}
+
+async function getJavaHomeValue (versionStr) {
+  let javaHomeResult = await teenProcess.exec("/usr/libexec/java_home", ["-v", versionStr]);
+  let stdOut = javaHomeResult.stdout;
+  if (stdOut) {
+    return stdOut.trim();
+  }
+  throw new Error(util.format("JAVA_HOME for % is not found", versionStr));
+}
+
 // returns: process object
-let launchAppiumServer = async (javaVersion, port) => {
+async function launchAppiumServer (javaVersion, port) {
   process.env.JAVA_HOME = await getJavaHomeValue(javaVersion);
   console.log(util.format("launch Appium server with JAVA_HOME=%s", process.env.JAVA_HOME));
   let command = appiumCmds[0];
@@ -87,16 +87,16 @@ let launchAppiumServer = async (javaVersion, port) => {
     console.log('Failed to start Appium server:' + err);
   });
   return proc;
-};
+}
 
-const killAppiumServer = (proc) => {
+function killAppiumServer (proc) {
   console.log("kill Appium server");
   if (proc) {
     proc.kill();
   }
-};
+}
 
-let checkTakeScreenshotWorks = async (driver) => {
+async function checkTakeScreenshotWorks (driver) {
   let retryCount = 10;
   let image = null;
   // Retry several times since sometimes screenshot fails (especially on iOS real device) due to the timing problem
@@ -114,9 +114,9 @@ let checkTakeScreenshotWorks = async (driver) => {
     }
   }
   assert.isTrue(!!image); // not null nor empty
-};
+}
 
-let checkSourceCommandWorks = async (driver) => {
+async function checkSourceCommandWorks (driver) {
   let xmlStr = await driver.source();
   let parsed = await xml2js(xmlStr);
   // check that the tree has a certain depth
@@ -125,11 +125,11 @@ let checkSourceCommandWorks = async (driver) => {
   let element3 = element2[Object.keys(element2)[0]];
   let element4 = element3[Object.keys(element3)[0]];
   assert.isTrue(!!element4); // not null
-};
+}
 
 // beforeHook: (driver) => {}. Called just after the driver is launched.
 // afterHook: (driver) => {}. Called before quitting the driver.
-const simpleCheck = async (caps, serverPort, beforeHook = null, afterHook = null) => {
+async function simpleCheck (caps, serverPort, beforeHook = null, afterHook = null) {
   let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', serverPort));
   try {
     await driver.init(caps);
@@ -177,7 +177,7 @@ const simpleCheck = async (caps, serverPort, beforeHook = null, afterHook = null
     }
     await driver.quit();
   }
-};
+}
 
 // This test checks if the current Appium server and client combination works well.
 // You need to install command line Appium server preliminarily.
