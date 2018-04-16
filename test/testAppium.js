@@ -48,8 +48,8 @@ function iOS11SimulatorBaseCapabilities () {
 function iOSRealDeviceBaseCapabilities () {
   return {
     platformName: 'iOS',
-    platformVersion: '10.3', // dummy
-    deviceName: 'iPhone 5', // dummy
+    platformVersion: 'real device', // dummy
+    deviceName: 'real device', // dummy
     udid: 'auto',
     automationName: 'XCUITest',
     showXcodeLog: true,
@@ -352,7 +352,7 @@ describe("Appium", function () {
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
         await driver.init(caps);
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 8; i++) {
           console.log("scroll");
           // scroll happens only when moveTo handles its argument as the absolute position
           let action = new TouchAction(driver);
@@ -379,7 +379,7 @@ describe("Appium", function () {
         await driver.init(caps);
         let graphics = await driver.elementByXPath("//android.widget.TextView[@content-desc='Graphics']");
         await graphics.click();
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 8; i++) {
           console.log("scroll");
           // scroll happens only when moveTo handles its argument as the absolute position
           let action = new TouchAction(driver);
