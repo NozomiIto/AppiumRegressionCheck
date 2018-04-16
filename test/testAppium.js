@@ -391,7 +391,7 @@ describe("Appium", function () {
         // and "Xfermodes" line, which occurs only when the page is scrolled, can be clicked
         let xfermodes = await driver.elementByXPath("//android.widget.TextView[@content-desc='Xfermodes']");
         await xfermodes.click();
-        await driver.elementById("//android.widget.TextView[@text='Graphics/Xfermodes']");
+        await driver.elementByXPath("//android.widget.TextView[@text='Graphics/Xfermodes']");
       } finally {
         await driver.quit();
       }
