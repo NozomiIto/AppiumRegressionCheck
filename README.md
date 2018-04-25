@@ -10,7 +10,8 @@ Test code to check if Appium works well for the various environments.
 - Install Appium server so that it can be called from the command line.
 - Connect Android real device and iOS real device for which required Appium set up has been completed.
 - Set the following environment variable if necessary.
-  - `APPLE_TEAM_ID_FOR_MAGIC_POD`: Your Apple team ID for iOS real device test
+  - `APPLE_TEAM_ID_FOR_MAGIC_POD`: Your Apple team ID for iOS real device test.
+  - `UPDATED_WDA_BUNDLE_ID_FOR_MAGIC_POD`: UpdatedWdaBundleID capabilities which is sometimes required for iOS real device test.
 - `npm test`
 
 # Run only specific test

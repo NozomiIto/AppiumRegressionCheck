@@ -46,7 +46,7 @@ function iOS11SimulatorBaseCapabilities () {
 }
 
 function iOSRealDeviceBaseCapabilities () {
-  return {
+  let caps = {
     platformName: 'iOS',
     platformVersion: 'real device', // dummy
     deviceName: 'real device', // dummy
@@ -58,6 +58,10 @@ function iOSRealDeviceBaseCapabilities () {
     xcodeOrgId: process.env.APPLE_TEAM_ID_FOR_MAGIC_POD,
     wdaLocalPort: iosRealDeviceWdaPort
   };
+  if (process.env.UPDATED_WDA_BUNDLE_ID_FOR_MAGIC_POD) {
+    caps.updatedWDABundleId = process.env.UPDATED_WDA_BUNDLE_ID_FOR_MAGIC_POD;
+  }
+  return caps;
 }
 
 function androidRealDeviceBaseCapabilities () {
