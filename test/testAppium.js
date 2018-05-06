@@ -178,7 +178,8 @@ async function simpleCheck (caps, serverPort, additionalCheck) {
       // check lock/unlock behavior just for simulator and emulator
       // (since unlock command for the real device requires the change for the unlock password of the device
       // and it is troublesome)
-      if (caps.platformName == "iOS" && caps.platformVersion != 'real device') {
+      if ((caps.platformName == "iOS" && caps.deviceName != 'real device')
+          || (caps.platformName == "Android" && caps.deviceName == "Android Emulator")) {
         console.log("lock");
         await driver.lock();
         await sleep(1000);
