@@ -165,6 +165,19 @@ async function simpleCheck (caps, serverPort, additionalCheck) {
     console.log("page source");
     await checkSourceWorks(driver);
 
+    if (additionalCheck) {
+      // check lock/unlock behavior just for simulator and emulator
+      // (since unlock command for the real device requires the change for the unlock password of the device
+      // and it is troublesome)
+      if (caps.platformName == "iOS" && caps.platformVersion != 'real device') {
+        console.log("lock");
+        await driver.lock();
+        await sleep(1000);
+        console.log("unlock");
+        await driver.unlock();
+      }
+    }
+
     // try to click one of the elements if clickable
     console.log("find and click");
     const targetClassName = caps.platformName === "iOS" ? "XCUIElementTypeOther" : "android.widget.FrameLayout";
