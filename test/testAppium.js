@@ -8,6 +8,7 @@ const forEach = require('mocha-each');
 const wd = require("wd");
 const TouchAction = wd.TouchAction;
 const util = require("util");
+const path = require("path");
 const childProcess = require("child_process");
 const teenProcess = require('teen_process');
 const requestPromise = require("request-promise");
@@ -64,11 +65,37 @@ function iOSRealDeviceBaseCapabilities () {
   return caps;
 }
 
-function androidRealDeviceBaseCapabilities () {
+async function getAndroidRealDeviceUdid() {
+  if (process.env.ANDROID_HOME) {
+    var androidHome = process.env.ANDROID_HOME;
+  } else {
+    var androidHome = path.join(process.env["HOME"], "Library/Android/sdk");
+  }
+  var adbPath = path.join(androidHome, "platform-tools/adb");
+  let adbResult = await teenProcess.exec(adbPath, ["devices"]);
+  let stdOut = adbResult.stdout.trim();
+  let deviceList = stdOut.split("\n");
+  // skip first line since the line is the header
+  for (var i = 1; i < deviceList.length; i++) {
+    let deviceDef = deviceList[i].trim();
+    if (!deviceDef) {
+      continue;
+    }
+    let deviceName = deviceDef.split(/\s+/)[0].trim();
+    if (deviceName.indexOf("emulator") == -1) {
+      return deviceName;
+    }
+  }
+  throw new Error(util.format("no Android real device is connected:\n%s", stdOut));
+}
+
+async function androidRealDeviceBaseCapabilities () {
+  let udid = await getAndroidRealDeviceUdid();
   return {
     'platformName': 'Android',
     'deviceName': 'Android',
     'automationName': 'uiautomator2',
+    'udid': udid
   };
 }
 
@@ -332,7 +359,7 @@ describe("Appium", function () {
     ])
     .it("should work with Android real device with Java8: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2, additionalCheck) => {
-          let caps = androidRealDeviceBaseCapabilities();
+          let caps = await androidRealDeviceBaseCapabilities();
           caps[targetKey1] = targetValue1;
           if (targetKey2) {
             caps[targetKey2] = targetValue2;
@@ -347,7 +374,7 @@ describe("Appium", function () {
     ])
     .it("should work with Android real device with Java9: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2, additionalCheck) => {
-          let caps = androidRealDeviceBaseCapabilities();
+          let caps = await androidRealDeviceBaseCapabilities();
           caps[targetKey1] = targetValue1;
           if (targetKey2) {
             caps[targetKey2] = targetValue2;
@@ -427,7 +454,7 @@ describe("Appium", function () {
     });
 
     it("on Android", async function () {
-      let caps = androidRealDeviceBaseCapabilities();
+      let caps = await androidRealDeviceBaseCapabilities();
       caps.noReset = false; // reset app state
       caps.app = testAppDir + "/ApiDemos-debug.apk";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
