@@ -9,9 +9,11 @@ Test code to check if Appium works well for the various environments.
 - Install required library by `npm install` in this directory.
 - Install Appium server so that it can be called from the command line.
 - Connect Android real device and iOS real device for which required Appium set up has been completed.
+- Create AVD (= Android emulator) used for the test (don't need to launch it).
 - Set the following environment variable if necessary.
   - `APPLE_TEAM_ID_FOR_MAGIC_POD`: Your Apple team ID for iOS real device test.
   - `UPDATED_WDA_BUNDLE_ID_FOR_MAGIC_POD`: UpdatedWdaBundleID capabilities which is sometimes required for iOS real device test.
+  - `AVD_FOR_MAGIC_POD`: The name of the existing AVD (= Android emulator) for Android emulator test like `Galaxy_S6_API_24`.
 - `npm test`
 
 # Run only specific test

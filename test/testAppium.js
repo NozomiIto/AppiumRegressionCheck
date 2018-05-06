@@ -72,6 +72,15 @@ function androidRealDeviceBaseCapabilities () {
   };
 }
 
+function androidEmulatorBaseCapabilities () {
+  return {
+    'platformName': 'Android',
+    'deviceName': 'Android Emulator',
+    'automationName': 'uiautomator2',
+    'avd': process.env.AVD_FOR_MAGIC_POD,
+  }
+}
+
 function sleep (milliSeconds) {
   return new Promise(resolve => setTimeout(resolve, milliSeconds));
 }
@@ -319,8 +328,6 @@ describe("Appium", function () {
     // Android real device must be connected
     forEach([
       ['app', testAppDir + "/ApiDemos-debug.apk", null, null, true],
-      // assume following apps have been installed
-      ['appPackage', 'com.android.chrome', 'appActivity', 'com.google.android.apps.chrome.Main', false]
     ])
     .it("should work with Android real device with Java8: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2, additionalCheck) => {
@@ -332,14 +339,43 @@ describe("Appium", function () {
           await simpleCheck(caps, java8Port, additionalCheck);
         });
 
+    // Android real device must be connected
     forEach([
-      ['app', testAppDir + "/ApiDemos-debug.apk", null, null, false],
       // assume following apps have been installed
       ['appPackage', 'com.google.android.apps.maps', 'appActivity', 'com.google.android.maps.MapsActivity', true]
     ])
     .it("should work with Android real device with Java9: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2, additionalCheck) => {
           let caps = androidRealDeviceBaseCapabilities();
+          caps[targetKey1] = targetValue1;
+          if (targetKey2) {
+            caps[targetKey2] = targetValue2;
+          }
+          await simpleCheck(caps, java9Port, additionalCheck);
+        });
+
+    // AVD must have been created
+    forEach([
+      // assume following apps have been installed
+      ['appPackage', 'com.google.android.apps.maps', 'appActivity', 'com.google.android.maps.MapsActivity', true]
+    ])
+    .it("should work with Android emulator with Java8: %s=%s",
+        async (targetKey1, targetValue1, targetKey2, targetValue2, additionalCheck) => {
+          let caps = androidEmulatorBaseCapabilities();
+          caps[targetKey1] = targetValue1;
+          if (targetKey2) {
+            caps[targetKey2] = targetValue2;
+          }
+          await simpleCheck(caps, java8Port, additionalCheck);
+        });
+
+    // AVD must have been created
+    forEach([
+      ['app', testAppDir + "/ApiDemos-debug.apk", null, null, true]
+    ])
+    .it("should work with Android emulator with Java9: %s=%s",
+        async (targetKey1, targetValue1, targetKey2, targetValue2, additionalCheck) => {
+          let caps = androidEmulatorBaseCapabilities();
           caps[targetKey1] = targetValue1;
           if (targetKey2) {
             caps[targetKey2] = targetValue2;
