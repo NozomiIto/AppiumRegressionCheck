@@ -235,6 +235,18 @@ async function simpleCheck (caps, serverPort, additionalCheck) {
       action.press({x: 50, y:50}).moveTo({x: 100, y: 100}).release();
       await driver.performTouchAction(action);
 
+      // check getting the focused activity works for Android
+      if (caps.platformName == "Android") {
+        console.log("package and activity");
+        let pkg = await driver.getCurrentPackage();
+        assert.isTrue(!!pkg); // not null nor empty
+        if (caps.appPackage) {
+          assert.equal(pkg, caps.appPackage);
+        }
+        let activity = await driver.getCurrentActivity();
+        assert.isTrue(!!activity); // not null nor empty
+      }
+
       // TODO check rotation works
       // console.log("orientation");
       // await driver.setOrientation("LANDSCAPE");
