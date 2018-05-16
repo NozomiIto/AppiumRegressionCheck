@@ -99,12 +99,21 @@ async function androidRealDeviceBaseCapabilities () {
   };
 }
 
-function androidEmulatorBaseCapabilities () {
+function android7EmulatorBaseCapabilities () {
   return {
     'platformName': 'Android',
     'deviceName': 'Android Emulator',
     'automationName': 'uiautomator2',
-    'avd': process.env.AVD_FOR_MAGIC_POD,
+    'avd': process.env.AVD7_FOR_MAGIC_POD,
+  }
+}
+
+function android8EmulatorBaseCapabilities () {
+  return {
+    'platformName': 'Android',
+    'deviceName': 'Android Emulator',
+    'automationName': 'uiautomator2',
+    'avd': process.env.AVD8_FOR_MAGIC_POD,
   }
 }
 
@@ -399,9 +408,9 @@ describe("Appium", function () {
       // assume following apps have been installed
       ['appPackage', 'com.google.android.apps.maps', 'appActivity', 'com.google.android.maps.MapsActivity', true]
     ])
-    .it("should work with Android emulator with Java8: %s=%s",
+    .it("should work with Android7 emulator with Java8: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2, additionalCheck) => {
-          let caps = androidEmulatorBaseCapabilities();
+          let caps = android7EmulatorBaseCapabilities();
           caps[targetKey1] = targetValue1;
           if (targetKey2) {
             caps[targetKey2] = targetValue2;
@@ -413,9 +422,38 @@ describe("Appium", function () {
     forEach([
       ['app', testAppDir + "/ApiDemos-debug.apk", null, null, true]
     ])
-    .it("should work with Android emulator with Java9: %s=%s",
+    .it("should work with Android7 emulator with Java9: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2, additionalCheck) => {
-          let caps = androidEmulatorBaseCapabilities();
+          let caps = android7EmulatorBaseCapabilities();
+          caps[targetKey1] = targetValue1;
+          if (targetKey2) {
+            caps[targetKey2] = targetValue2;
+          }
+          await simpleCheck(caps, java9Port, additionalCheck);
+        });
+
+    // AVD must have been created
+    forEach([
+      ['app', testAppDir + "/ApiDemos-debug.apk", null, null, true]
+    ])
+    .it("should work with Android8 emulator with Java8: %s=%s",
+        async (targetKey1, targetValue1, targetKey2, targetValue2, additionalCheck) => {
+          let caps = android8EmulatorBaseCapabilities();
+          caps[targetKey1] = targetValue1;
+          if (targetKey2) {
+            caps[targetKey2] = targetValue2;
+          }
+          await simpleCheck(caps, java8Port, additionalCheck);
+        });
+
+    // AVD must have been created
+    forEach([
+      // assume following apps have been installed
+      ['appPackage', 'com.android.vending', 'appActivity', '.AssetBrowserActivity', true]
+    ])
+    .it("should work with Android8 emulator with Java9: %s=%s",
+        async (targetKey1, targetValue1, targetKey2, targetValue2, additionalCheck) => {
+          let caps = android8EmulatorBaseCapabilities();
           caps[targetKey1] = targetValue1;
           if (targetKey2) {
             caps[targetKey2] = targetValue2;
