@@ -231,6 +231,12 @@ async function simpleCheck (caps, serverPort, additionalCheck) {
         console.log("unlock");
         await driver.unlock();
       }
+
+      console.log("close app");
+      await driver.closeApp();
+      await sleep(1000);
+      console.log("launch app");
+      await driver.launchApp();
     }
 
     // try to click one of the elements if clickable
@@ -380,7 +386,7 @@ describe("Appium", function () {
     .it("should work with iOS real device: %s=%s", async (targetKey, targetValue, additionalCheck) => {
       let caps = iOSRealDeviceBaseCapabilities();
       caps[targetKey] = targetValue;
-      await simpleCheck(caps, java8Port);
+      await simpleCheck(caps, java8Port, additionalCheck);
     });
 
     // Android real device must be connected
