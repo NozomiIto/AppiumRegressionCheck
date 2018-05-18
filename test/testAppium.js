@@ -95,7 +95,10 @@ async function androidRealDeviceBaseCapabilities () {
     'platformName': 'Android',
     'deviceName': 'Android',
     'automationName': 'uiautomator2',
-    'udid': udid
+    'udid': udid,
+    // Since Magic Pod always skip the initial activity wait so that users don't need to care about appWaitActivity,
+    // we also skip this wait by specifying 'appWaitActivity': '*'
+    'appWaitActivity': '*',
   };
 }
 
@@ -105,6 +108,9 @@ function android7EmulatorBaseCapabilities () {
     'deviceName': 'Android Emulator',
     'automationName': 'uiautomator2',
     'avd': process.env.AVD7_FOR_MAGIC_POD,
+    // Since Magic Pod always skip the initial activity wait so that users don't need to care about appWaitActivity,
+    // we also skip this wait by specifying 'appWaitActivity': '*'
+    'appWaitActivity': '*',
   }
 }
 
@@ -114,6 +120,9 @@ function android8EmulatorBaseCapabilities () {
     'deviceName': 'Android Emulator',
     'automationName': 'uiautomator2',
     'avd': process.env.AVD8_FOR_MAGIC_POD,
+    // Since Magic Pod always skip the initial activity wait so that users don't need to care about appWaitActivity,
+    // we also skip this wait by specifying 'appWaitActivity': '*'
+    'appWaitActivity': '*',
   }
 }
 
