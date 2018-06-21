@@ -12,7 +12,8 @@ const path = require("path");
 const childProcess = require("child_process");
 const teenProcess = require('teen_process');
 const requestPromise = require("request-promise");
-const xml2js = require('xml2js-es6-promise');
+const xpath = require('xpath');
+const xmlDom = require('xmldom');
 
 const appiumCmds = process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD ? ["node", process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD] : ["appium"];
 const testAppDir = __dirname + "/../test_app";
@@ -175,17 +176,31 @@ async function checkSessionLessScreenshotWorks (driver, wdaPort) {
   assert.isTrue(!!body); // not null
 }
 
-async function checkSourceWorks (driver) {
-  let xmlStr = await driver.source();
-  let parsed = await xml2js(xmlStr);
-  // check that the tree has a certain depth
-  let element1 = parsed[Object.keys(parsed)[0]];
-  let element2 = element1[Object.keys(element1)[0]];
-  let element3 = element2[Object.keys(element2)[0]];
-  let element4 = element3[Object.keys(element3)[0]];
-  assert.isTrue(!!element4); // not null
+function getFirstElementChild (parent) {
+  let childNodes = parent.childNodes;
+  for (let i = 0; i < childNodes.length; i++) {
+    let childNode = childNodes[i];
+    if (childNode.constructor.name == "Element") {
+      return childNode;
+    }
+  }
+  return null;
 }
 
+// returns: Document object representing XML tree
+async function checkSourceWorks (driver) {
+  let xmlStr = await driver.source();
+  let doc = new xmlDom.DOMParser().parseFromString(xmlStr);
+  // check that the tree has a certain depth
+  let element1 = getFirstElementChild(doc.documentElement);
+  let element2 = getFirstElementChild(element1);
+  let element3 = getFirstElementChild(element2);
+  let element4 = getFirstElementChild(element3);
+  assert.isTrue(!!element4); // not null
+  return doc;
+}
+
+// returns: Document object representing XML tree
 async function checkSessionLessSourceWorks (driver, wdaPort) {
   let opt = {
     method: 'GET',
@@ -194,13 +209,14 @@ async function checkSessionLessSourceWorks (driver, wdaPort) {
   let result = await requestPromise(opt);
   let xmlStr = JSON.parse(result).value;
   try {
-    let parsed = await xml2js(xmlStr);
+    let doc = new xmlDom.DOMParser().parseFromString(xmlStr);
     // check that the tree has a certain depth
-    let element1 = parsed[Object.keys(parsed)[0]];
-    let element2 = element1[Object.keys(element1)[0]];
-    let element3 = element2[Object.keys(element2)[0]];
-    let element4 = element3[Object.keys(element3)[0]];
+    let element1 = getFirstElementChild(doc.documentElement);
+    let element2 = getFirstElementChild(element1);
+    let element3 = getFirstElementChild(element2);
+    let element4 = getFirstElementChild(element3);
     assert.isTrue(!!element4); // not null
+    return doc
   } catch (e) {
     console.log(e);
     console.log("invalid source XML");
@@ -490,6 +506,36 @@ describe("Appium", function () {
       caps.app = testAppDir + "/AppiumRegressionTestApp.ipa";
       caps.fullReset = true;
       await iOSAppiumRegressionTestAppCheck(caps, iosRealDeviceWdaPort);
+    });
+  });
+
+  describe("iOS source contents should be valid", function () {
+    it("on iOS simulator11", async function () {
+      let caps = iOS11SimulatorBaseCapabilities();
+      caps.app = testAppDir + "/magic_pod_demo_app.app";
+      let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
+      try {
+        await driver.init(caps);
+        console.log("page source");
+        let doc1 = await checkSourceWorks(driver);
+        let nameNodes1 = xpath.select("//*[contains(@name, '名前')]", doc1);
+        assert.equal(nameNodes1.length, 1);
+        let genderNodes1 = xpath.select("//*[contains(@name, '性別')]", doc1);
+        assert.equal(genderNodes1.length, 1);
+
+        // we have experienced the bug of page source command which happens after taking screenshot
+        console.log("screenshot");
+        await checkScreenshotWorks(driver);
+
+        console.log("page source　again");
+        let doc2 = await checkSourceWorks(driver);
+        let nameNodes2 = xpath.select("//*[contains(@name, '名前')]", doc2);
+        assert.equal(nameNodes2.length, 1);
+        let genderNodes2 = xpath.select("//*[contains(@name, '性別')]", doc2);
+        assert.equal(genderNodes2.length, 1);
+      } finally {
+        await driver.quit();
+      }
     });
   });
 

@@ -15,7 +15,8 @@
     "request-promise": "^4.2.2",
     "teen_process": "^1.12.0",
     "wd": "^1.6.1",
-    "xml2js-es6-promise": "^1.1.1"
+    "xmldom": "^0.1.27",
+    "xpath": "0.0.27"
   },
   "scripts": {
     "lint": "node node_modules/eslint/bin/eslint.js .",
