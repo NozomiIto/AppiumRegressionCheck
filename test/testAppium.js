@@ -516,6 +516,7 @@ describe("Appium", function () {
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
         await driver.init(caps);
+        await sleep(2000);
         console.log("page source");
         let doc1 = await checkSourceWorks(driver);
         let nameNodes1 = xpath.select("//*[contains(@name, '名前')]", doc1);
