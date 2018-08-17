@@ -38,7 +38,7 @@ function iOS10SimulatorBaseCapabilities () {
 function iOS11SimulatorBaseCapabilities () {
   return {
     platformName: 'iOS',
-    platformVersion: '11.3',
+    platformVersion: '11.4',
     deviceName: 'iPhone 8',
     automationName: 'XCUITest',
     showXcodeLog: true,
