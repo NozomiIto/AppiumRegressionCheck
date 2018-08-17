@@ -194,9 +194,7 @@ async function checkSourceWorks (driver) {
   // check that the tree has a certain depth
   let element1 = getFirstElementChild(doc.documentElement);
   let element2 = getFirstElementChild(element1);
-  let element3 = getFirstElementChild(element2);
-  let element4 = getFirstElementChild(element3);
-  assert.isTrue(!!element4); // not null
+  assert.isTrue(!!element2, element1); // not null
   return doc;
 }
 
