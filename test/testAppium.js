@@ -545,6 +545,7 @@ describe("Appium", function () {
         await driver.init(caps);
         let element = await driver.elementByXPath("//XCUIElementTypeStaticText[@name='Search Bars']/parent::*");
         await driver.execute("mobile: scroll", {element: element, toVisible: true});
+        element = await driver.elementByXPath("//XCUIElementTypeStaticText[@name='Search Bars']/parent::*");
         await element.click();
       } finally {
         await driver.quit();
