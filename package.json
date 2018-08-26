@@ -23,8 +23,8 @@
     "test": "mocha"
   },
   "devDependencies": {
-    "eslint": "3.x",
-    "babel-eslint": "7.x",
+    "babel-eslint": "^8.2.6",
+    "eslint": "^5.4.0",
     "eslint-config-appium": "^2.1.0",
     "eslint-plugin-babel": "3.x",
     "eslint-plugin-import": "2.x",
