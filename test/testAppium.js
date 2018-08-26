@@ -536,6 +536,22 @@ describe("Appium", function () {
     });
   });
 
+  describe("mobile: scroll should work", function () {
+    it("on iOS simulator11", async function () {
+      let caps = iOS11SimulatorBaseCapabilities();
+      caps.app = testAppDir + "/UICatalog.app";
+      let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
+      try {
+        await driver.init(caps);
+        let element = await driver.elementByXPath("//XCUIElementTypeStaticText[@name='Search Bars']/parent::*");
+        await driver.execute("mobile: scroll", {element: element, toVisible: true});
+        await element.click();
+      } finally {
+        await driver.quit();
+      }
+    });
+  });
+
   describe("moveTo action should work", function () {
     it("on iOS", async function () {
       let caps = iOS11SimulatorBaseCapabilities();
