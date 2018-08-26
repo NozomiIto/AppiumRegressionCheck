@@ -14,7 +14,7 @@
     "mocha-each": "^1.1.0",
     "request-promise": "^4.2.2",
     "teen_process": "^1.12.0",
-    "wd": "^1.6.1",
+    "wd": "^1.10.3",
     "xmldom": "^0.1.27",
     "xpath": "0.0.27"
   },
