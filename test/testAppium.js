@@ -112,6 +112,8 @@ function android7EmulatorBaseCapabilities () {
     // Since Magic Pod always skip the initial activity wait so that users don't need to care about appWaitActivity,
     // we also skip this wait by specifying 'appWaitActivity': '*'
     'appWaitActivity': '*',
+    'unicodeKeyboard': true,
+    'resetKeyboard': true,
   }
 }
 
@@ -124,6 +126,8 @@ function android8EmulatorBaseCapabilities () {
     // Since Magic Pod always skip the initial activity wait so that users don't need to care about appWaitActivity,
     // we also skip this wait by specifying 'appWaitActivity': '*'
     'appWaitActivity': '*',
+    'unicodeKeyboard': true,
+    'resetKeyboard': true,
   }
 }
 
@@ -156,9 +160,10 @@ async function launchAppiumServer (javaVersion, port) {
 }
 
 function killAppiumServer (proc) {
-  console.log("kill Appium server");
   if (proc) {
-    proc.kill();
+    console.log("kill Appium server");
+    proc.kill("SIGKILL");
+    console.log("killed Appium server");
   }
 }
 
