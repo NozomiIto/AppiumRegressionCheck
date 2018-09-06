@@ -100,6 +100,8 @@ async function androidRealDeviceBaseCapabilities () {
     // Since Magic Pod always skip the initial activity wait so that users don't need to care about appWaitActivity,
     // we also skip this wait by specifying 'appWaitActivity': '*'
     'appWaitActivity': '*',
+    'unicodeKeyboard': true,
+    'resetKeyboard': true,
   };
 }
 
@@ -560,29 +562,38 @@ describe("Appium", function () {
     });
   });
 
+  let uiCatalogMoveToTest = async function(caps) {
+    let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
+    try {
+      await driver.init(caps);
+      for (let i = 0; i < 8; i++) {
+        console.log("scroll");
+        // scroll happens only when moveTo handles its argument as the absolute position
+        let action = new TouchAction(driver);
+        action.press({x:200, y:200}).wait({ms: 500}).moveTo({x:200, y:0}).release();
+        await driver.performTouchAction(action);
+        await sleep(1000);
+      }
+      // assert the scroll was actually happened
+      // and "Toolbars" line, which occurs only when the page is scrolled, can be clicked
+      let toolbars = await driver.elementById("Toolbars");
+      await toolbars.click();
+      await driver.elementById("Tinted");
+    } finally {
+      await driver.quit();
+    }
+  }
+
   describe("moveTo action should work", function () {
-    it("on iOS", async function () {
+    it("on iOS simulator11", async function () {
       let caps = iOS11SimulatorBaseCapabilities();
       caps.app = testAppDir + "/UICatalog.app";
-      let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
-      try {
-        await driver.init(caps);
-        for (let i = 0; i < 8; i++) {
-          console.log("scroll");
-          // scroll happens only when moveTo handles its argument as the absolute position
-          let action = new TouchAction(driver);
-          action.press({x:200, y:200}).wait({ms: 500}).moveTo({x:200, y:0}).release();
-          await driver.performTouchAction(action);
-          await sleep(1000);
-        }
-        // assert the scroll was actually happened
-        // and "Toolbars" line, which occurs only when the page is scrolled, can be clicked
-        let toolbars = await driver.elementById("Toolbars");
-        await toolbars.click();
-        await driver.elementById("Tinted");
-      } finally {
-        await driver.quit();
-      }
+      await uiCatalogMoveToTest(caps);
+    });
+    it("on iOS real device", async function () {
+      let caps = iOSRealDeviceBaseCapabilities();
+      caps.app = testAppDir + "/UICatalog.ipa";
+      await uiCatalogMoveToTest(caps);
     });
 
     it("on Android", async function () {
