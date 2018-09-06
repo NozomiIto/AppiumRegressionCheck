@@ -574,12 +574,9 @@ describe("Appium", function () {
         await driver.performTouchAction(action);
         await sleep(1000);
       }
-
-      // assert the scroll was actually happened
-      // and "Toolbars" line, which occurs only when the page is scrolled, can be clicked
-
-      let toolbars = await driver.elementById("Toolbars");
-      await toolbars.click();
+      await sleep(3000);
+      let searchBars = await driver.elementById("Search Bars");
+      await searchBars.click();
       await driver.elementById("Tinted");
     } finally {
       await driver.quit();
