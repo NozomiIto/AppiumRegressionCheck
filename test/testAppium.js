@@ -577,7 +577,7 @@ describe("Appium", function () {
       await sleep(3000);
       let searchBars = await driver.elementById("Search Bars");
       await searchBars.click();
-      await driver.elementById("Tinted");
+      await driver.elementById("Default");
     } finally {
       await driver.quit();
     }
