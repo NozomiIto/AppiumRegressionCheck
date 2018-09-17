@@ -583,6 +583,27 @@ describe("Appium", function () {
     }
   }
 
+  describe("multiple test launches should not fail", function() {
+    it("on iOS real device", async function() {
+      for (let i = 0; i < 4; i++) {
+        let caps = iOSRealDeviceBaseCapabilities();
+        if (i % 2 == 0) {
+          caps.app = testAppDir + "/UICatalog.ipa";
+        } else {
+          caps.app = testAppDir + "/TestApp.ipa";
+        }
+        caps.notReset = true;
+        console.log("launch app");
+        let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
+        try {
+          await driver.init(caps);
+        } finally {
+          driver.quit();
+        }
+      }
+    });
+  })
+
   describe("moveTo action should work", function () {
     it("on iOS simulator11", async function () {
       let caps = iOS11SimulatorBaseCapabilities();
