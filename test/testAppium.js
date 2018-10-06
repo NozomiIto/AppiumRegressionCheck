@@ -23,6 +23,8 @@ const java9Port = 4724;
 const iosSimulatorWdaPort = 8100;
 const iosRealDeviceWdaPort = 8101;
 
+// TODO session attach/detach test
+
 function iOS10SimulatorBaseCapabilities () {
   return {
     platformName: 'iOS',
@@ -35,10 +37,10 @@ function iOS10SimulatorBaseCapabilities () {
   };
 }
 
-function iOS11SimulatorBaseCapabilities () {
+function iOS12SimulatorBaseCapabilities () {
   return {
     platformName: 'iOS',
-    platformVersion: '11.4',
+    platformVersion: '12.0',
     deviceName: 'iPhone 8',
     automationName: 'XCUITest',
     showXcodeLog: true,
@@ -379,7 +381,7 @@ describe("Appium", function () {
       ['bundleId', 'com.apple.Maps', false],
       ['bundleId', 'com.apple.Preferences', false]
     ])
-    .it("should work with iOS simulator 10: %s=%s", async (targetKey, targetValue, additionalCheck) => {
+    .it("should work with iOS simulator10: %s=%s", async (targetKey, targetValue, additionalCheck) => {
       let caps = iOS10SimulatorBaseCapabilities();
       caps[targetKey] = targetValue;
       await simpleCheck(caps, java8Port, additionalCheck);
@@ -391,8 +393,8 @@ describe("Appium", function () {
       ['bundleId', 'com.apple.news', false],
       ['bundleId', 'com.apple.mobileslideshow', true]
     ])
-    .it("should work with iOS simulator 11: %s=%s", async (targetKey, targetValue, additionalCheck) => {
-      let caps = iOS11SimulatorBaseCapabilities();
+    .it("should work with iOS simulator12: %s=%s", async (targetKey, targetValue, additionalCheck) => {
+      let caps = iOS12SimulatorBaseCapabilities();
       caps[targetKey] = targetValue;
       await simpleCheck(caps, java8Port, additionalCheck);
     });
@@ -497,8 +499,8 @@ describe("Appium", function () {
   });
 
   describe("iOS screenshot and source should work in various situation", function () {
-    it("on iOS simulator11", async function () {
-      let caps = iOS11SimulatorBaseCapabilities();
+    it("on iOS simulator12", async function () {
+      let caps = iOS12SimulatorBaseCapabilities();
       caps.app = testAppDir + "/AppiumRegressionTestApp.app";
       caps.fullReset = true;
       await iOSAppiumRegressionTestAppCheck(caps, iosSimulatorWdaPort);
@@ -513,8 +515,8 @@ describe("Appium", function () {
   });
 
   describe("iOS source contents should be valid", function () {
-    it("on iOS simulator11", async function () {
-      let caps = iOS11SimulatorBaseCapabilities();
+    it("on iOS simulator12", async function () {
+      let caps = iOS12SimulatorBaseCapabilities();
       caps.app = testAppDir + "/magic_pod_demo_app.app";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
@@ -544,8 +546,8 @@ describe("Appium", function () {
   });
 
   describe("mobile: scroll should work", function () {
-    it("on iOS simulator11", async function () {
-      let caps = iOS11SimulatorBaseCapabilities();
+    it("on iOS simulator12", async function () {
+      let caps = iOS12SimulatorBaseCapabilities();
       caps.app = testAppDir + "/UICatalog.app";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
@@ -605,8 +607,8 @@ describe("Appium", function () {
   })
 
   describe("moveTo action should work", function () {
-    it("on iOS simulator11", async function () {
-      let caps = iOS11SimulatorBaseCapabilities();
+    it("on iOS simulator12", async function () {
+      let caps = iOS12SimulatorBaseCapabilities();
       caps.app = testAppDir + "/UICatalog.app";
       await uiCatalogMoveToTest(caps);
     });
