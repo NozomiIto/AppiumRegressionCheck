@@ -402,7 +402,7 @@ describe("Appium", function () {
     forEach([
       ['app', testAppDir + "/TestApp.ipa", true],
       ['bundleId', 'com.apple.camera', false],
-      ['bundleId', 'com.apple.Health', false]
+      ['bundleId', 'com.apple.mobilecal', false]
     ])
     .it("should work with iOS real device: %s=%s", async (targetKey, targetValue, additionalCheck) => {
       let caps = iOSRealDeviceBaseCapabilities();
@@ -568,11 +568,11 @@ describe("Appium", function () {
     let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
     try {
       await driver.init(caps);
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < 8; i++) {
         console.log("scroll");
         // scroll happens only when moveTo handles its argument as the absolute position
         let action = new TouchAction(driver);
-        action.press({x:160, y:284}).wait({ms: 500}).moveTo({x:160, y:142}).release();
+        action.press({x:200, y:200}).wait({ms: 500}).moveTo({x:200, y:0}).release();
         await driver.performTouchAction(action);
         await sleep(1000);
       }
@@ -610,11 +610,6 @@ describe("Appium", function () {
     it("on iOS simulator12", async function () {
       let caps = iOS12SimulatorBaseCapabilities();
       caps.app = testAppDir + "/UICatalog.app";
-      await uiCatalogMoveToTest(caps);
-    });
-    it("on iOS real device", async function () {
-      let caps = iOSRealDeviceBaseCapabilities();
-      caps.app = testAppDir + "/UICatalog.ipa";
       await uiCatalogMoveToTest(caps);
     });
 
