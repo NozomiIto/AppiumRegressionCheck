@@ -14,6 +14,7 @@ const teenProcess = require('teen_process');
 const requestPromise = require("request-promise");
 const xpath = require('xpath');
 const xmlDom = require('xmldom');
+const nodeSimctl = require('node-simctl');
 
 const appiumCmds = process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD ? ["node", process.env.APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD] : ["appium"];
 const testAppDir = __dirname + "/../test_app";
@@ -22,7 +23,7 @@ const java9Port = 4724;
 // use different ports to avoid the mixed communication with other iOS devices
 const iosSimulatorWdaPort = 8100;
 const iosRealDeviceWdaPort = 8101;
-
+iOS10SimulatorBaseCapabilities
 // TODO session attach/detach test
 
 function iOS10SimulatorBaseCapabilities () {
@@ -40,8 +41,21 @@ function iOS10SimulatorBaseCapabilities () {
 function iOS12SimulatorBaseCapabilities () {
   return {
     platformName: 'iOS',
-    platformVersion: '12.0',
+    platformVersion: '12.1',
     deviceName: 'iPhone 8',
+    automationName: 'XCUITest',
+    showXcodeLog: true,
+    useJSONSource: true, // more stable and faster
+    wdaLocalPort: iosSimulatorWdaPort
+  };
+}
+
+function iOS12SimulatorForUdidBaseCapabilities (udid) {
+  return {
+    platformName: 'iOS',
+    platformVersion: 'dummy',
+    deviceName: 'dummy',
+    udid: udid,
     automationName: 'XCUITest',
     showXcodeLog: true,
     useJSONSource: true, // more stable and faster
@@ -390,13 +404,26 @@ describe("Appium", function () {
     forEach([
       ['app', testAppDir + "/UICatalog.app", false],
       ['app', testAppDir + "/magic_pod_demo_app.app", false],
-      ['bundleId', 'com.apple.news', false],
       ['bundleId', 'com.apple.mobileslideshow', true]
     ])
     .it("should work with iOS simulator12: %s=%s", async (targetKey, targetValue, additionalCheck) => {
       let caps = iOS12SimulatorBaseCapabilities();
       caps[targetKey] = targetValue;
       await simpleCheck(caps, java8Port, additionalCheck);
+    });
+
+    forEach([
+      ['bundleId', 'com.apple.news', false]
+    ])
+    .it("should work with newly created iOS simulator12: %s=%s", async (targetKey, targetValue, additionalCheck) => {
+      let udid = await nodeSimctl.createDevice("testDevice", "iPhone 8", "12.1");
+      try {
+        let caps = iOS12SimulatorForUdidBaseCapabilities(udid);
+        caps[targetKey] = targetValue;
+        await simpleCheck(caps, java8Port, additionalCheck);
+      } finally {
+        await nodeSimctl.deleteDevice(udid);
+      }
     });
 
     forEach([
