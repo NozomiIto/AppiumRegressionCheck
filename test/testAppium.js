@@ -413,12 +413,14 @@ describe("Appium", function () {
     });
 
     forEach([
-      ['bundleId', 'com.apple.news', false]
+      ['bundleId', 'com.apple.Preferences', false]
     ])
-    .it("should work with newly created iOS simulator12: %s=%s", async (targetKey, targetValue, additionalCheck) => {
+    .it("should work with newly created iOS simulator12 with headless: %s=%s", async (targetKey, targetValue, additionalCheck) => {
       let udid = await nodeSimctl.createDevice("testDevice", "iPhone 8", "12.1");
+      console.log("New simulator has been created");
       try {
         let caps = iOS12SimulatorForUdidBaseCapabilities(udid);
+        caps.isHeadless = true
         caps[targetKey] = targetValue;
         await simpleCheck(caps, java8Port, additionalCheck);
       } finally {
