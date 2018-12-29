@@ -34,7 +34,8 @@ function iOS10SimulatorBaseCapabilities () {
     automationName: 'XCUITest',
     showXcodeLog: true,
     useJSONSource: true, // more stable and faster
-    wdaLocalPort: iosSimulatorWdaPort
+    wdaLocalPort: iosSimulatorWdaPort,
+    language: 'ja'
   };
 }
 
@@ -46,7 +47,8 @@ function iOS12SimulatorBaseCapabilities () {
     automationName: 'XCUITest',
     showXcodeLog: true,
     useJSONSource: true, // more stable and faster
-    wdaLocalPort: iosSimulatorWdaPort
+    wdaLocalPort: iosSimulatorWdaPort,
+    language: 'ja'
   };
 }
 
@@ -59,7 +61,8 @@ function iOS12SimulatorForUdidBaseCapabilities (udid) {
     automationName: 'XCUITest',
     showXcodeLog: true,
     useJSONSource: true, // more stable and faster
-    wdaLocalPort: iosSimulatorWdaPort
+    wdaLocalPort: iosSimulatorWdaPort,
+    language: 'ja'
   };
 }
 
