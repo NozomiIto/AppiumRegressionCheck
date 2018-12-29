@@ -394,24 +394,30 @@ describe("Appium", function () {
 
   describe("simpleCheck", function () {
     forEach([
-      ['app', testAppDir + "/TestApp.app", true],
-      ['bundleId', 'com.apple.Maps', false],
-      ['bundleId', 'com.apple.Preferences', false]
+      ['app', testAppDir + "/TestApp.app", true, false],
+      ['bundleId', 'com.apple.Maps', false, false],
+      ['bundleId', 'com.apple.Preferences', false, true]
     ])
-    .it("should work with iOS simulator10: %s=%s", async (targetKey, targetValue, additionalCheck) => {
+    .it("should work with iOS simulator10: %s=%s", async (targetKey, targetValue, additionalCheck, reduceMotion) => {
       let caps = iOS10SimulatorBaseCapabilities();
       caps[targetKey] = targetValue;
+      if (reduceMotion) {
+        caps["reduceMotion"] = true;
+      }
       await simpleCheck(caps, java8Port, additionalCheck);
     });
 
     forEach([
-      ['app', testAppDir + "/UICatalog.app", false],
-      ['app', testAppDir + "/magic_pod_demo_app.app", false],
-      ['bundleId', 'com.apple.mobileslideshow', true]
+      ['app', testAppDir + "/UICatalog.app", false, true],
+      ['app', testAppDir + "/magic_pod_demo_app.app", false, false],
+      ['bundleId', 'com.apple.mobileslideshow', true, false]
     ])
-    .it("should work with iOS simulator12: %s=%s", async (targetKey, targetValue, additionalCheck) => {
+    .it("should work with iOS simulator12: %s=%s", async (targetKey, targetValue, additionalCheck, reduceMotion) => {
       let caps = iOS12SimulatorBaseCapabilities();
       caps[targetKey] = targetValue;
+      if (reduceMotion) {
+        caps["reduceMotion"] = true;
+      }
       await simpleCheck(caps, java8Port, additionalCheck);
     });
 
