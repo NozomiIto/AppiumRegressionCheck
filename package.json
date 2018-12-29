@@ -14,6 +14,7 @@
     "mocha-each": "^1.1.0",
     "node-simctl": "^3.16.0",
     "request-promise": "^4.2.2",
+    "image-size": "^0.6.1",
     "teen_process": "^1.12.0",
     "wd": "^1.11.0",
     "xmldom": "^0.1.27",

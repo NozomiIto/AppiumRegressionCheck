@@ -5,6 +5,7 @@
 const chai = require("chai");
 const assert = chai.assert;
 const forEach = require('mocha-each');
+const sizeOf = require('image-size');
 const wd = require("wd");
 const TouchAction = wd.TouchAction;
 const util = require("util");
@@ -606,11 +607,15 @@ describe("Appium", function () {
     let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
     try {
       await driver.init(caps);
+      let application = await driver.elementByClassName("XCUIElementTypeApplication");
+      let screenSize = await application.getSize();
+      let centerX = Math.floor(size["width"] / 2);
+      let centerY = Math.floor(size["height"] / 2);
       for (let i = 0; i < 8; i++) {
         console.log("scroll");
         // scroll happens only when moveTo handles its argument as the absolute position
         let action = new TouchAction(driver);
-        action.press({x:200, y:200}).wait({ms: 500}).moveTo({x:200, y:0}).release();
+        action.press({x:centerX, y:centerY}).wait({ms: 500}).moveTo({x:centerX, y:(centerY-150)}).release();
         await driver.performTouchAction(action);
         await sleep(1000);
       }
