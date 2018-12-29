@@ -426,16 +426,18 @@ describe("Appium", function () {
       ['bundleId', 'com.apple.Preferences', false]
     ])
     .it("should work with newly created iOS simulator12 with headless: %s=%s", async (targetKey, targetValue, additionalCheck) => {
-      let udid = await nodeSimctl.createDevice("testDevice", "iPhone 8", "12.1");
-      console.log("New simulator has been created");
-      try {
-        let caps = iOS12SimulatorForUdidBaseCapabilities(udid);
-        caps.isHeadless = true
-        caps[targetKey] = targetValue;
-        await simpleCheck(caps, java8Port, additionalCheck);
-      } finally {
-        await nodeSimctl.deleteDevice(udid);
+      // TODO use UDID for existing simulator instead of creating new simulator
+      let devices = (await nodeSimctl.getDevices())["12.1"];
+      devices = devices.filter((device) => device.name.indexOf("iPhone 8") != -1);
+      if (devices.length == 0) {
+        throw new Error("cannot find the simulator for iOS 12.1 and iPhone 8. Please prepare it.");
       }
+      let udid = devices[0].udid;
+      let caps = iOS12SimulatorForUdidBaseCapabilities(udid);
+      caps.isHeadless = true
+      caps.reduceMotion = true;
+      caps[targetKey] = targetValue;
+      await simpleCheck(caps, java8Port, additionalCheck);
     });
 
     forEach([
@@ -609,8 +611,8 @@ describe("Appium", function () {
       await driver.init(caps);
       let application = await driver.elementByClassName("XCUIElementTypeApplication");
       let screenSize = await application.getSize();
-      let centerX = Math.floor(size["width"] / 2);
-      let centerY = Math.floor(size["height"] / 2);
+      let centerX = Math.floor(screenSize["width"] / 2);
+      let centerY = Math.floor(screenSize["height"] / 2);
       for (let i = 0; i < 8; i++) {
         console.log("scroll");
         // scroll happens only when moveTo handles its argument as the absolute position
