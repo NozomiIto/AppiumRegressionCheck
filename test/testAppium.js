@@ -425,7 +425,7 @@ describe("Appium", function () {
     forEach([
       ['bundleId', 'com.apple.Preferences', false]
     ])
-    .it("should work with newly created iOS simulator12 with headless: %s=%s", async (targetKey, targetValue, additionalCheck) => {
+    .it("should work with headless udid iOS simulator12: %s=%s", async (targetKey, targetValue, additionalCheck) => {
       // TODO use UDID for existing simulator instead of creating new simulator
       let devices = (await nodeSimctl.getDevices())["12.1"];
       devices = devices.filter((device) => device.name.indexOf("iPhone 8") != -1);
