@@ -6,6 +6,7 @@ const chai = require("chai");
 const assert = chai.assert;
 const forEach = require('mocha-each');
 const sizeOf = require('image-size');
+const rimraf = require("rimraf");
 const wd = require("wd");
 const TouchAction = wd.TouchAction;
 const util = require("util");
@@ -683,6 +684,31 @@ describe("Appium", function () {
       } finally {
         await driver.quit();
       }
+    });
+  });
+
+  describe("parallel Appium server run should work", function () {
+    it("on iOS simulator12", async function () {
+      rimraf.sync(__dirname + "/../DerivedData1");
+      rimraf.sync(__dirname + "/../DerivedData2");
+      let caps1 = iOS12SimulatorBaseCapabilities();
+      let caps2 = iOS12SimulatorBaseCapabilities();
+      caps1.wdaLocalPort = 8102;
+      caps2.wdaLocalPort = 8103;
+      caps1.derivedDataPath = __dirname + "/../DerivedData1";
+      caps2.derivedDataPath = __dirname + "/../DerivedData2";
+      caps1.deviceName = 'iPhone 8';
+      caps2.deviceName = 'iPhone 8 Plus';
+      caps1.fullReset = true;
+      caps2.fullReset = true;
+      caps1.isHeadless = true;
+      caps2.isHeadless = true;
+      caps1.showXcodeLog = false;
+      caps2.showXcodeLog = false;
+      caps1.app = testAppDir + "/magic_pod_demo_app.app";
+      caps2.app = testAppDir + "/magic_pod_demo_app.app";
+      // use different Appium servers
+      await Promise.all([simpleCheck(caps1, java8Port, false), simpleCheck(caps2, java9Port, false)]);
     });
   });
 });
