@@ -703,8 +703,6 @@ describe("Appium", function () {
       caps2.fullReset = true;
       caps1.isHeadless = true;
       caps2.isHeadless = true;
-      caps1.showXcodeLog = false;
-      caps2.showXcodeLog = false;
       caps1.app = testAppDir + "/magic_pod_demo_app.app";
       caps2.app = testAppDir + "/magic_pod_demo_app.app";
       // use different Appium servers
