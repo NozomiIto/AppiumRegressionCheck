@@ -11,15 +11,16 @@
     "chai": "^3.5.0",
     "check-engines": "^1.5.0",
     "image-size": "^0.6.1",
+    "lodash": "^4.13.1",
     "mocha": "^5.2.0",
     "mocha-each": "^1.1.0",
-    "node-simctl": "^3.16.0",
+    "node-simctl": "^3.18.1",
     "request-promise": "^4.2.2",
     "rimraf": "^2.6.1",
-    "teen_process": "^1.12.0",
+    "teen_process": "^1.6.0",
     "wd": "^1.11.1",
     "xmldom": "^0.1.27",
-    "xpath": "0.0.27"
+    "xpath": "0.0.24"
   },
   "scripts": {
     "lint": "node node_modules/eslint/bin/eslint.js .",
