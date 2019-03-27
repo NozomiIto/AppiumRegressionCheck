@@ -27,12 +27,12 @@
     "test": "mocha"
   },
   "devDependencies": {
-    "babel-eslint": "^8.2.6",
-    "eslint": "^5.4.0",
-    "eslint-config-appium": "^2.1.0",
-    "eslint-plugin-babel": "3.x",
-    "eslint-plugin-import": "2.x",
-    "eslint-plugin-mocha": "4.x",
-    "eslint-plugin-promise": "3.x"
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.15.3",
+    "eslint-config-appium": "^4.0.1",
+    "eslint-plugin-babel": "5.3.0",
+    "eslint-plugin-import": "2.16.0",
+    "eslint-plugin-mocha": "5.3.0",
+    "eslint-plugin-promise": "4.0.1"
   }
 }
