@@ -57,7 +57,7 @@ function iOS12SimulatorBaseCapabilities () {
 function iOS12SimulatorForUdidBaseCapabilities (udid) {
   return {
     platformName: 'iOS',
-    platformVersion: '0.1',  // actually dummy
+    platformVersion: '9.9',  // actually dummy
     deviceName: 'dummy',
     udid: udid,
     automationName: 'XCUITest',
@@ -71,7 +71,7 @@ function iOS12SimulatorForUdidBaseCapabilities (udid) {
 function iOSRealDeviceBaseCapabilities () {
   let caps = {
     platformName: 'iOS',
-    platformVersion: '0.1',  // actually dummy
+    platformVersion: '9.9',  // actually dummy
     deviceName: 'real device', // dummy
     udid: 'auto',
     automationName: 'XCUITest',
