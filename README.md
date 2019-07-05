@@ -31,3 +31,8 @@ Run like the following.
 
 If `APPIUM_MAIN_JS_PATH_FOR_MAGIC_POD` environment variable is specified,
 the test calls main.js by node instead of the Appium executable.
+
+# Our test result
+
+- Appium 1.13.0: found [a problem](https://github.com/appium/WebDriverAgent/pull/166)
+- Appium 1.12.1: passed all, but has [small problem](https://github.com/appium/appium/issues/12504)
