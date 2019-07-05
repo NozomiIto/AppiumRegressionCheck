@@ -25,13 +25,12 @@ const java9Port = 4724;
 // use different ports to avoid the mixed communication with other iOS devices
 const iosSimulatorWdaPort = 8100;
 const iosRealDeviceWdaPort = 8101;
-iOS10SimulatorBaseCapabilities
 // TODO session attach/detach test
 
-function iOS10SimulatorBaseCapabilities () {
+function iOS11SimulatorBaseCapabilities () {
   return {
     platformName: 'iOS',
-    platformVersion: '10.3',
+    platformVersion: '11.4',
     deviceName: 'iPhone 7',
     automationName: 'XCUITest',
     showXcodeLog: true,
@@ -400,8 +399,8 @@ describe("Appium", function () {
       ['bundleId', 'com.apple.Maps', false, false],
       ['bundleId', 'com.apple.Preferences', false, true]
     ])
-    .it("should work with iOS simulator10: %s=%s", async (targetKey, targetValue, additionalCheck, reduceMotion) => {
-      let caps = iOS10SimulatorBaseCapabilities();
+    .it("should work with iOS simulator11: %s=%s", async (targetKey, targetValue, additionalCheck, reduceMotion) => {
+      let caps = iOS11SimulatorBaseCapabilities();
       caps[targetKey] = targetValue;
       if (reduceMotion) {
         caps["reduceMotion"] = true;
