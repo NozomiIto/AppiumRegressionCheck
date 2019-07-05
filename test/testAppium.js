@@ -44,7 +44,7 @@ function iOS10SimulatorBaseCapabilities () {
 function iOS12SimulatorBaseCapabilities () {
   return {
     platformName: 'iOS',
-    platformVersion: '12.1',
+    platformVersion: '12.2',
     deviceName: 'iPhone 8',
     automationName: 'XCUITest',
     showXcodeLog: true,
@@ -428,10 +428,10 @@ describe("Appium", function () {
     ])
     .it("should work with headless udid iOS simulator12: %s=%s", async (targetKey, targetValue, additionalCheck) => {
       // TODO use UDID for existing simulator instead of creating new simulator
-      let devices = (await nodeSimctl.getDevices())["12.1"];
+      let devices = (await nodeSimctl.getDevices())["12.2"];
       devices = devices.filter((device) => device.name.indexOf("iPhone 8") != -1);
       if (devices.length == 0) {
-        throw new Error("cannot find the simulator for iOS 12.1 and iPhone 8. Please prepare it.");
+        throw new Error("cannot find the simulator for iOS 12.2 and iPhone 8. Please prepare it.");
       }
       let udid = devices[0].udid;
       let caps = iOS12SimulatorForUdidBaseCapabilities(udid);
