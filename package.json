@@ -4,8 +4,8 @@
   "author": "TRIDENT Inc.",
   "private": true,
   "engines": {
-    "node": "10.11.0",
-    "npm": "6.4.1"
+    "node": "10.16.0",
+    "npm": "6.9.0"
   },
   "dependencies": {
     "chai": "^3.5.0",
@@ -14,10 +14,10 @@
     "lodash": "^4.17.11",
     "mocha": "^5.2.0",
     "mocha-each": "^1.1.0",
-    "node-simctl": "^3.18.1",
+    "node-simctl": "^5.0.2",
     "request-promise": "^4.2.2",
     "rimraf": "^2.6.1",
-    "teen_process": "^1.6.0",
+    "teen_process": "^1.14.2",
     "wd": "^1.11.1",
     "xmldom": "^0.1.27",
     "xpath": "0.0.24"
