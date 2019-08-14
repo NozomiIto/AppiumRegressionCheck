@@ -8,6 +8,7 @@ const forEach = require('mocha-each');
 const sizeOf = require('image-size');
 const rimraf = require("rimraf");
 const wd = require("wd");
+const webdriverio = require("webdriverio");
 const TouchAction = wd.TouchAction;
 const util = require("util");
 const path = require("path");
@@ -153,6 +154,20 @@ function android8EmulatorBaseCapabilities () {
   }
 }
 
+async function androidEspressoBaseCapabilities () {
+ let udid = await getAndroidRealDeviceUdid();
+  return {
+    'platformName': 'Android',
+    'deviceName': 'Android',
+    'automationName': 'Espresso',
+    'udid': udid,
+    // TODO remove this comment once https://github.com/appium/appium-espresso-driver/pull/473 is published
+    // 'appWaitActivity': '*',
+    'unicodeKeyboard': true,
+    'resetKeyboard': true,
+  };
+}
+
 function sleep (milliSeconds) {
   return new Promise(resolve => setTimeout(resolve, milliSeconds));
 }
@@ -173,7 +188,7 @@ async function launchAppiumServer (javaVersion, port) {
   let command = appiumCmds[0];
   let logFileName = util.format("appiumServer_Java%s.log", javaVersion);
   let args = appiumCmds.slice(1).concat(
-    ["--log", logFileName, "--session-override", "--log-level", "debug", "--local-timezone", "--port", port]);
+    ["--log", logFileName, "--log-level", "debug", "--local-timezone", "--port", port]);
   let proc = childProcess.spawn(command, args);
   proc.on('error', (err) => {
     console.log('Failed to start Appium server:' + err);
@@ -706,6 +721,38 @@ describe("Appium", function () {
       caps2.app = testAppDir + "/magic_pod_demo_app.app";
       // use different Appium servers
       await Promise.all([simpleCheck(caps1, java8Port, false), simpleCheck(caps2, java9Port, false)]);
+    });
+  });
+
+  describe("uiAutomator2 and Espresso combination should work", function() {
+    it("on Android real device", async function() {
+      let eCaps = await androidEspressoBaseCapabilities();
+      eCaps.app = testAppDir + "/ApiDemos-debug.apk";
+
+      let uCaps = await androidRealDeviceBaseCapabilities();
+      uCaps.appPackage = "io.appium.android.apis";
+      uCaps.appActivity = "io.appium.android.apis.ApiDemos";
+      uCaps.autoLaunch = false;
+
+      let eDriver = await wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java9Port));
+      await eDriver.init(eCaps);
+      console.log("Espresso init: finished");
+      let uDriver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java9Port));
+      await uDriver.init(uCaps);
+      console.log("UiAutomator2 init: finished");
+      try {
+        const eElement = await eDriver.elementByXPath("//android.widget.TextView[@content-desc='Graphics']");
+        await eElement.click();
+        let uElement = await uDriver.elementByXPath("//android.widget.TextView[@content-desc='Arcs']");
+        await uElement.click();
+      } finally {
+        //if (uDriver) {
+        //  await uDriver.quit();
+        //}
+        //if (eDriver) {
+        // await eDriver.quit();
+        //}
+      }
     });
   });
 });
