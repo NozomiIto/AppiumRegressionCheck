@@ -730,9 +730,18 @@ describe("Appium", function () {
       eCaps.app = testAppDir + "/ApiDemos-debug.apk";
 
       let uCaps = await androidRealDeviceBaseCapabilities();
-      uCaps.appPackage = "io.appium.android.apis";
-      uCaps.appActivity = "io.appium.android.apis.ApiDemos";
+      uCaps.appPackage = "dummy";
+      uCaps.appActivity = "dummy";
       uCaps.autoLaunch = false;
+
+      let cleanUp = false; // this test will work well by specifying true here
+      if (cleanUp) {
+        console.log("UiAutomator2: start cleanup");
+        let uDriver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java9Port));
+        await uDriver.init(uCaps);
+        uDriver.quit();
+        console.log("UiAutomator2: cleaned up");
+      }
 
       let eDriver = await wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java9Port));
       await eDriver.init(eCaps);
@@ -743,15 +752,19 @@ describe("Appium", function () {
       try {
         const eElement = await eDriver.elementByXPath("//android.widget.TextView[@content-desc='Graphics']");
         await eElement.click();
+        await sleep(2000);
         let uElement = await uDriver.elementByXPath("//android.widget.TextView[@content-desc='Arcs']");
         await uElement.click();
       } finally {
-        //if (uDriver) {
-        //  await uDriver.quit();
-        //}
-        //if (eDriver) {
-        // await eDriver.quit();
-        //}
+        let quit = false; // this test will work well by specifying true here
+        if (quit) {
+          if (uDriver) {
+            await uDriver.quit();
+          }
+          if (eDriver) {
+            await eDriver.quit();
+          }
+        }
       }
     });
   });
