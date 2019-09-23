@@ -44,7 +44,7 @@ function iOS11SimulatorBaseCapabilities () {
 function iOS12SimulatorBaseCapabilities () {
   return {
     platformName: 'iOS',
-    platformVersion: '12.2',
+    platformVersion: '12.4',
     deviceName: 'iPhone 8',
     automationName: 'XCUITest',
     showXcodeLog: true,
@@ -441,11 +441,10 @@ describe("Appium", function () {
       ['bundleId', 'com.apple.Preferences', false]
     ])
     .it("should work with headless udid iOS simulator12: %s=%s", async (targetKey, targetValue, additionalCheck) => {
-      // TODO use UDID for existing simulator instead of creating new simulator
-      let devices = (await nodeSimctl.getDevices())["12.2"];
+      let devices = (await nodeSimctl.getDevices())["12.4"];
       devices = devices.filter((device) => device.name.indexOf("iPhone 8") != -1);
       if (devices.length == 0) {
-        throw new Error("cannot find the simulator for iOS 12.2 and iPhone 8. Please prepare it.");
+        throw new Error("cannot find the simulator for iOS 12.4 and iPhone 8. Please prepare it.");
       }
       let udid = devices[0].udid;
       let caps = iOS12SimulatorForUdidBaseCapabilities(udid);
@@ -739,7 +738,7 @@ describe("Appium", function () {
         console.log("UiAutomator2: start cleanup");
         let uDriver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java9Port));
         await uDriver.init(uCaps);
-        uDriver.quit();
+        await uDriver.quit();
         console.log("UiAutomator2: cleaned up");
       }
 
