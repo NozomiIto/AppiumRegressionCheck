@@ -368,12 +368,12 @@ async function iOSAppiumRegressionTestAppCheck (caps, wdaPort) {
     console.log("session-less source for normal page");
     await checkSessionLessSourceWorks(driver, wdaPort);
 
-    await driver.closeApp();
+    await driver.backgroundApp(-1);
 
-    console.log("session-less screenshot for home");
-    await checkSessionLessScreenshotWorks(driver, wdaPort);
-    console.log("session-less source for home");
-    await checkSessionLessSourceWorks(driver, wdaPort);
+    console.log("screenshot for home");
+    await checkScreenshotWorks(driver, wdaPort);
+    console.log("source for home");
+    await checkSourceWorks(driver, wdaPort);
   } finally {
     try {
       await driver.acceptAlert(); // try to close in case acceptAlert is not called
