@@ -28,19 +28,6 @@ const iosSimulatorWdaPort = 8100;
 const iosRealDeviceWdaPort = 8101;
 // TODO session attach/detach test
 
-function iOS11SimulatorBaseCapabilities () {
-  return {
-    platformName: 'iOS',
-    platformVersion: '11.4',
-    deviceName: 'iPhone 7',
-    automationName: 'XCUITest',
-    showXcodeLog: true,
-    useJSONSource: true, // more stable and faster
-    wdaLocalPort: iosSimulatorWdaPort,
-    language: 'ja'
-  };
-}
-
 function iOS12SimulatorBaseCapabilities () {
   return {
     platformName: 'iOS',
@@ -60,6 +47,19 @@ function iOS12SimulatorForUdidBaseCapabilities (udid) {
     platformVersion: '9.9',  // actually dummy
     deviceName: 'dummy',
     udid: udid,
+    automationName: 'XCUITest',
+    showXcodeLog: true,
+    useJSONSource: true, // more stable and faster
+    wdaLocalPort: iosSimulatorWdaPort,
+    language: 'ja'
+  };
+}
+
+function iOS13SimulatorBaseCapabilities () {
+  return {
+    platformName: 'iOS',
+    platformVersion: '13.0',
+    deviceName: 'iPhone X',
     automationName: 'XCUITest',
     showXcodeLog: true,
     useJSONSource: true, // more stable and faster
@@ -414,8 +414,8 @@ describe("Appium", function () {
       ['bundleId', 'com.apple.Maps', false, false],
       ['bundleId', 'com.apple.Preferences', false, true]
     ])
-    .it("should work with iOS simulator11: %s=%s", async (targetKey, targetValue, additionalCheck, reduceMotion) => {
-      let caps = iOS11SimulatorBaseCapabilities();
+    .it("should work with iOS simulator13: %s=%s", async (targetKey, targetValue, additionalCheck, reduceMotion) => {
+      let caps = iOS13SimulatorBaseCapabilities();
       caps[targetKey] = targetValue;
       if (reduceMotion) {
         caps["reduceMotion"] = true;
