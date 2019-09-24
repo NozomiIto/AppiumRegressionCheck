@@ -711,8 +711,6 @@ describe("Appium", function () {
       caps2.derivedDataPath = __dirname + "/../DerivedData2";
       caps1.deviceName = 'iPhone 8';
       caps2.deviceName = 'iPhone 8 Plus';
-      caps1.fullReset = true;
-      caps2.fullReset = true;
       caps1.isHeadless = true;
       caps2.isHeadless = true;
       caps1.app = testAppDir + "/magic_pod_demo_app.app";
