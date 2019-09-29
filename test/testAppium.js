@@ -28,20 +28,7 @@ const iosSimulatorWdaPort = 8100;
 const iosRealDeviceWdaPort = 8101;
 // TODO session attach/detach test
 
-function iOS12SimulatorBaseCapabilities () {
-  return {
-    platformName: 'iOS',
-    platformVersion: '12.2',
-    deviceName: 'iPhone 8',
-    automationName: 'XCUITest',
-    showXcodeLog: true,
-    useJSONSource: true, // more stable and faster
-    wdaLocalPort: iosSimulatorWdaPort,
-    language: 'ja'
-  };
-}
-
-function iOS12SimulatorForUdidBaseCapabilities (udid) {
+function iOS13SimulatorForUdidBaseCapabilities (udid) {
   return {
     platformName: 'iOS',
     platformVersion: '9.9',  // actually dummy
@@ -58,8 +45,8 @@ function iOS12SimulatorForUdidBaseCapabilities (udid) {
 function iOS13SimulatorBaseCapabilities () {
   return {
     platformName: 'iOS',
-    platformVersion: '13.0',
-    deviceName: 'iPhone X',
+    platformVersion: '13.1',
+    deviceName: 'iPhone 8',
     automationName: 'XCUITest',
     showXcodeLog: true,
     useJSONSource: true, // more stable and faster
@@ -67,6 +54,8 @@ function iOS13SimulatorBaseCapabilities () {
     language: 'ja'
   };
 }
+
+let alreadyRunIOSRealDeviceWithUseNewWDA = false; // for https://github.com/Magic-Pod/AppiumRegressionCheck/issues/26
 
 function iOSRealDeviceBaseCapabilities () {
   let caps = {
@@ -83,6 +72,10 @@ function iOSRealDeviceBaseCapabilities () {
   };
   if (process.env.UPDATED_WDA_BUNDLE_ID_FOR_MAGIC_POD) {
     caps.updatedWDABundleId = process.env.UPDATED_WDA_BUNDLE_ID_FOR_MAGIC_POD;
+  }
+  if (!alreadyRunIOSRealDeviceWithUseNewWDA) {
+    alreadyRunIOSRealDeviceWithUseNewWDA = true;
+    caps.useNewWDA = true;
   }
   return caps;
 }
@@ -229,15 +222,19 @@ function getFirstElementChild (parent) {
   return null;
 }
 
-// returns: Document object representing XML tree
-async function checkSourceWorks (driver) {
-  let xmlStr = await driver.source();
-  let doc = new xmlDom.DOMParser().parseFromString(xmlStr);
-  // check that the tree has a certain depth
-  let element1 = getFirstElementChild(doc.documentElement);
-  let element2 = getFirstElementChild(element1);
-  assert.isTrue(!!element2, element1); // not null
-  return doc;
+// returns: source string in XML or description format
+async function checkSourceWorks (driver, isOS) {
+  if (isOS) {
+    return  await driver.execute("mobile: source", {format: "description"});
+  } else {
+    let xmlStr = await driver.source();
+    let doc = new xmlDom.DOMParser().parseFromString(xmlStr);
+    // check that the tree has a certain depth
+    let element1 = getFirstElementChild(doc.documentElement);
+    let element2 = getFirstElementChild(element1);
+    assert.isTrue(!!element2, element1); // not null
+    return xmlStr;
+  }
 }
 
 // returns: Document object representing XML tree
@@ -334,7 +331,7 @@ async function simpleCheck (caps, serverPort, additionalCheck) {
       console.log("screenshot again");
       await checkScreenshotWorks(driver);
       console.log("page source again");
-      await checkSourceWorks(driver);
+      await checkSourceWorks(driver, caps.platformName == "iOS");
     }
   } finally {
     try {
@@ -355,7 +352,7 @@ async function iOSAppiumRegressionTestAppCheck (caps, wdaPort) {
     console.log("screenshot for system alert");
     await checkScreenshotWorks(driver);
     console.log("page source for system alert");
-    await checkSourceWorks(driver);
+    await checkSourceWorks(driver, true);
     console.log("session-less screenshot for system alert");
     await checkSessionLessScreenshotWorks(driver, wdaPort);
     console.log("session-less source for system alert");
@@ -373,7 +370,7 @@ async function iOSAppiumRegressionTestAppCheck (caps, wdaPort) {
     console.log("screenshot for home");
     await checkScreenshotWorks(driver, wdaPort);
     console.log("source for home");
-    await checkSourceWorks(driver, wdaPort);
+    await checkSourceWorks(driver, true);
   } finally {
     try {
       await driver.acceptAlert(); // try to close in case acceptAlert is not called
@@ -411,24 +408,14 @@ describe("Appium", function () {
   describe("simpleCheck", function () {
     forEach([
       ['app', testAppDir + "/TestApp.app", true, false],
+      ['app', testAppDir + "/UICatalog.app", false, true],
+      ['app', testAppDir + "/magic_pod_demo_app.app", false, false],
       ['bundleId', 'com.apple.Maps', false, false],
-      ['bundleId', 'com.apple.Preferences', false, true]
+      ['bundleId', 'com.apple.Preferences', false, true],
+      ['bundleId', 'com.apple.mobileslideshow', true, false]
     ])
     .it("should work with iOS simulator13: %s=%s", async (targetKey, targetValue, additionalCheck, reduceMotion) => {
       let caps = iOS13SimulatorBaseCapabilities();
-      caps[targetKey] = targetValue;
-      if (reduceMotion) {
-        caps["reduceMotion"] = true;
-      }
-      await simpleCheck(caps, java8Port, additionalCheck);
-    });
-    forEach([
-      ['app', testAppDir + "/UICatalog.app", false, true],
-      ['app', testAppDir + "/magic_pod_demo_app.app", false, false],
-      ['bundleId', 'com.apple.mobileslideshow', true, false]
-    ])
-    .it("should work with iOS simulator12: %s=%s", async (targetKey, targetValue, additionalCheck, reduceMotion) => {
-      let caps = iOS12SimulatorBaseCapabilities();
       caps[targetKey] = targetValue;
       if (reduceMotion) {
         caps["reduceMotion"] = true;
@@ -439,14 +426,14 @@ describe("Appium", function () {
     forEach([
       ['bundleId', 'com.apple.Preferences', false]
     ])
-    .it("should work with headless udid iOS simulator12: %s=%s", async (targetKey, targetValue, additionalCheck) => {
-      let devices = (await nodeSimctl.getDevices())["12.2"];
+    .it("should work with headless udid iOS simulator13: %s=%s", async (targetKey, targetValue, additionalCheck) => {
+      let devices = (await nodeSimctl.getDevices())["13.1"];
       devices = devices.filter((device) => device.name.indexOf("iPhone 8") != -1);
       if (devices.length == 0) {
-        throw new Error("cannot find the simulator for iOS 12.2 and iPhone 8. Please prepare it.");
+        throw new Error("cannot find the simulator for iOS 13.1 and iPhone 8. Please prepare it.");
       }
       let udid = devices[0].udid;
-      let caps = iOS12SimulatorForUdidBaseCapabilities(udid);
+      let caps = iOS13SimulatorForUdidBaseCapabilities(udid);
       caps.isHeadless = true
       caps.reduceMotion = true;
       caps[targetKey] = targetValue;
@@ -553,8 +540,8 @@ describe("Appium", function () {
   });
 
   describe("iOS screenshot and source should work in various situation", function () {
-    it("on iOS simulator12", async function () {
-      let caps = iOS12SimulatorBaseCapabilities();
+    it("on iOS simulator13", async function () {
+      let caps = iOS13SimulatorBaseCapabilities();
       caps.app = testAppDir + "/AppiumRegressionTestApp.app";
       caps.fullReset = true;
       await iOSAppiumRegressionTestAppCheck(caps, iosSimulatorWdaPort);
@@ -569,30 +556,28 @@ describe("Appium", function () {
   });
 
   describe("iOS source contents should be valid", function () {
-    it("on iOS simulator12", async function () {
-      let caps = iOS12SimulatorBaseCapabilities();
+    it("on iOS simulator13", async function () {
+      let caps = iOS13SimulatorBaseCapabilities();
       caps.app = testAppDir + "/magic_pod_demo_app.app";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
         await driver.init(caps);
         await sleep(2000);
         console.log("page source");
-        let doc1 = await checkSourceWorks(driver);
-        let nameNodes1 = xpath.select("//*[contains(@name, '名前')]", doc1);
-        assert.equal(nameNodes1.length, 1);
-        let genderNodes1 = xpath.select("//*[contains(@name, '性別')]", doc1);
-        assert.equal(genderNodes1.length, 1);
+        let tree1 = await checkSourceWorks(driver, true);
+        // TODO better check
+        assert.include(tree1, "}}, identifier: 'ユーザー登録'");
+        assert.include(tree1, "}}, label: '登録'");
 
         // we have experienced the bug of page source command which happens after taking screenshot
         console.log("screenshot");
         await checkScreenshotWorks(driver);
 
         console.log("page source　again");
-        let doc2 = await checkSourceWorks(driver);
-        let nameNodes2 = xpath.select("//*[contains(@name, '名前')]", doc2);
-        assert.equal(nameNodes2.length, 1);
-        let genderNodes2 = xpath.select("//*[contains(@name, '性別')]", doc2);
-        assert.equal(genderNodes2.length, 1);
+        let tree2 = await checkSourceWorks(driver, true);
+        // TODO better check
+        assert.include(tree2, "}}, identifier: 'ユーザー登録'");
+        assert.include(tree2, "}}, label: '登録'");
       } finally {
         await driver.quit();
       }
@@ -600,8 +585,8 @@ describe("Appium", function () {
   });
 
   describe("mobile: scroll should work", function () {
-    it("on iOS simulator12", async function () {
-      let caps = iOS12SimulatorBaseCapabilities();
+    it("on iOS simulator13", async function () {
+      let caps = iOS13SimulatorBaseCapabilities();
       caps.app = testAppDir + "/UICatalog.app";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
@@ -665,8 +650,8 @@ describe("Appium", function () {
   })
 
   describe("moveTo action should work", function () {
-    it("on iOS simulator12", async function () {
-      let caps = iOS12SimulatorBaseCapabilities();
+    it("on iOS simulator13", async function () {
+      let caps = iOS13SimulatorBaseCapabilities();
       caps.app = testAppDir + "/UICatalog.app";
       await uiCatalogMoveToTest(caps);
     });
@@ -700,11 +685,11 @@ describe("Appium", function () {
   });
 
   describe("parallel Appium server run should work", function () {
-    it("on iOS simulator12", async function () {
+    it("on iOS simulator13", async function () {
       rimraf.sync(__dirname + "/../DerivedData1");
       rimraf.sync(__dirname + "/../DerivedData2");
-      let caps1 = iOS12SimulatorBaseCapabilities();
-      let caps2 = iOS12SimulatorBaseCapabilities();
+      let caps1 = iOS13SimulatorBaseCapabilities();
+      let caps2 = iOS13SimulatorBaseCapabilities();
       caps1.wdaLocalPort = 8102;
       caps2.wdaLocalPort = 8103;
       caps1.derivedDataPath = __dirname + "/../DerivedData1";
