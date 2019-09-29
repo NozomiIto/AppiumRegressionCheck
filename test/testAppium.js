@@ -237,29 +237,6 @@ async function checkSourceWorks (driver, isOS) {
   }
 }
 
-// returns: Document object representing XML tree
-async function checkSessionLessSourceWorks (driver, wdaPort) {
-  let opt = {
-    method: 'GET',
-    url: util.format("http://localhost:%d/source", wdaPort)
-  };
-  let result = await requestPromise(opt);
-  let xmlStr = JSON.parse(result).value;
-  try {
-    let doc = new xmlDom.DOMParser().parseFromString(xmlStr);
-    // check that the tree has a certain depth
-    let element1 = getFirstElementChild(doc.documentElement);
-    let element2 = getFirstElementChild(element1);
-    assert.isTrue(!!element2, element1); // not null
-    return doc
-  } catch (e) {
-    console.log(e);
-    console.log("invalid source XML");
-    console.log(xmlStr);
-    throw e;
-  }
-}
-
 async function simpleCheck (caps, serverPort, additionalCheck) {
   let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', serverPort));
   try {
@@ -355,15 +332,11 @@ async function iOSAppiumRegressionTestAppCheck (caps, wdaPort) {
     await checkSourceWorks(driver, true);
     console.log("session-less screenshot for system alert");
     await checkSessionLessScreenshotWorks(driver, wdaPort);
-    console.log("session-less source for system alert");
-    await checkSessionLessSourceWorks(driver, wdaPort);
 
     await driver.acceptAlert(); // currently the alert must be displayed
 
     console.log("session-less screenshot for normal page");
     await checkSessionLessScreenshotWorks(driver, wdaPort);
-    console.log("session-less source for normal page");
-    await checkSessionLessSourceWorks(driver, wdaPort);
 
     await driver.backgroundApp(-1);
 
