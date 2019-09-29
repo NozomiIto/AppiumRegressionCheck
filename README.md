@@ -34,7 +34,7 @@ the test calls main.js by node instead of the Appium executable.
 
 # Our test result
 
-- Appium 1.15.0: passed all tests (with Xcode10.3), but seems to have some problems
+- Appium 1.15.0: passed all tests, but seems to has some problems like [this](https://github.com/Magic-Pod/AppiumRegressionCheck/issues/26) and [this](https://github.com/Magic-Pod/AppiumRegressionCheck/issues/27) and [this](https://github.com/appium/appium/issues/13302) and [this](https://github.com/appium/appium/issues/13288).
 - Appium 1.14.0: passed all tests
 - Appium 1.13.0: found [a problem](https://github.com/appium/WebDriverAgent/pull/166)
 - Appium 1.12.1: passed all tests, but has [small problem](https://github.com/appium/appium/issues/12504)
