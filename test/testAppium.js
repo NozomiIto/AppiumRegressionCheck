@@ -115,10 +115,7 @@ async function androidRealDeviceBaseCapabilities () {
     // we also skip this wait by specifying 'appWaitActivity': '*'
     'appWaitActivity': '*',
     'unicodeKeyboard': true,
-    'resetKeyboard': true,
-    'chromeOptions': {
-        'w3c': false
-    } // In order to use `getSize` and `getLocation` command. Somehow wd.W3CActions is still available.
+    'resetKeyboard': true
   };
 }
 
@@ -162,6 +159,21 @@ async function androidEspressoBaseCapabilities () {
     'unicodeKeyboard': true,
     'resetKeyboard': true,
   };
+}
+
+async function androidRTKBaseCapabilities () {
+  return {
+    'platformName': 'Android',
+    'automationName': 'uiautomator2',
+    'deviceName': 'Pixel',
+    'platformVersion': '10',
+    // Since Magic Pod always skip the initial activity wait so that users don't need to care about appWaitActivity,
+    // we also skip this wait by specifying 'appWaitActivity': '*'
+    'appWaitActivity': '*',
+    'unicodeKeyboard': true,
+    'resetKeyboard': true,
+    'accessToken': process.env.RTK_ACCESS_TOKEN
+  }
 }
 
 function sleep (milliSeconds) {
