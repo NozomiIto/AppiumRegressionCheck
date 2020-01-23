@@ -116,6 +116,9 @@ async function androidRealDeviceBaseCapabilities () {
     'appWaitActivity': '*',
     'unicodeKeyboard': true,
     'resetKeyboard': true,
+    'chromeOptions': {
+        'w3c': false
+    } // In order to use `getSize` and `getLocation` command. Somehow wd.W3CActions is still available.
   };
 }
 
@@ -181,7 +184,7 @@ async function launchAppiumServer (javaVersion, port) {
   let command = appiumCmds[0];
   let logFileName = util.format("appiumServer_Java%s.log", javaVersion);
   let args = appiumCmds.slice(1).concat(
-    ["--log", logFileName, "--log-level", "debug", "--local-timezone", "--port", port]);
+    ["--log", logFileName, "--log-level", "debug", "--local-timezone", "--port", port, "--allow-insecure", "chromedriver_autodownload"]);
   let proc = childProcess.spawn(command, args);
   proc.on('error', (err) => {
     console.log('Failed to start Appium server:' + err);
@@ -675,6 +678,28 @@ describe("Appium", function () {
       caps2.app = testAppDir + "/magic_pod_demo_app.app";
       // use different Appium servers
       await Promise.all([simpleCheck(caps1, java8Port, false), simpleCheck(caps2, java9Port, false)]);
+    });
+  });
+
+  describe("webview context test should work", function() {
+    it("on Android real device", async function() {
+      let caps = await androidRealDeviceBaseCapabilities();
+      caps.app = testAppDir + "/webview_app_debug.apk";
+      let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
+      try {
+        await driver.init(caps);
+        let githubAppium2Line = await driver.elementByXPath("//*[@text='GITHUB APPIUM WEBVIEW2']");
+        await githubAppium2Line.click();
+        let contexts = await driver.contexts();
+        console.log(contexts);
+        let webViewContext = "WEBVIEW_com.trident_qa.sample_app";
+        assert(contexts.includes(webViewContext));
+        await driver.context(webViewContext); // context switch
+        let release = await driver.elementByXPath("//a[text()='Releases']");
+        await release.click();
+      } finally {
+        await driver.quit();
+      }
     });
   });
 
