@@ -45,7 +45,7 @@ function iOS13SimulatorForUdidBaseCapabilities (udid) {
 function iOS13SimulatorBaseCapabilities () {
   return {
     platformName: 'iOS',
-    platformVersion: '13.2',
+    platformVersion: '13.3',
     deviceName: 'iPhone 8',
     automationName: 'XCUITest',
     showXcodeLog: true,
@@ -60,7 +60,7 @@ let alreadyRunIOSRealDeviceWithUseNewWDA = false; // for https://github.com/Magi
 function iOSRealDeviceBaseCapabilities () {
   let caps = {
     platformName: 'iOS',
-    platformVersion: '9.9',  // actually dummy
+    platformVersion: '13.3',
     deviceName: 'real device', // dummy
     udid: 'auto',
     automationName: 'XCUITest',
@@ -78,6 +78,18 @@ function iOSRealDeviceBaseCapabilities () {
     caps.useNewWDA = true;
   }
   return caps;
+}
+
+async function iOSRTKBaseCapabilities () {
+  return {
+    platformName: 'iOS',
+    automationName: 'XCUITest',
+    deviceName: 'iPhone 11 Pro',
+    platformVersion: '13',
+    showXcodeLog: true,
+    useJSONSource: true, // more stable and faster
+    accessToken: process.env.RTK_ACCESS_TOKEN,
+  }
 }
 
 async function getAndroidRealDeviceUdid() {
@@ -702,6 +714,27 @@ describe("Appium", function () {
         await driver.init(caps);
         let githubAppium2Line = await driver.elementByXPath("//*[@text='GITHUB APPIUM WEBVIEW2']");
         await githubAppium2Line.click();
+        let contexts = await driver.contexts();
+        console.log(contexts);
+        let webViewContext = "WEBVIEW_com.trident_qa.sample_app";
+        assert(contexts.includes(webViewContext));
+        await driver.context(webViewContext); // context switch
+        let release = await driver.elementByXPath("//a[text()='Releases']");
+        await release.click();
+      } finally {
+        await driver.quit();
+      }
+    });
+
+    // TODO this does not work yet
+    it("on iOS real device", async function() {
+      let caps = iOSRealDeviceBaseCapabilities();
+      caps.app = "https://github.com/Magic-Pod/AppiumRegressionCheck/blob/master/test_app/iOSWebView.ipa?raw=true";
+      let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
+      try {
+        await driver.init(caps);
+        let singleWebViewLine = await driver.elementByAccessibilityId("SingleWebView");
+        await singleWebViewLine.click();
         let contexts = await driver.contexts();
         console.log(contexts);
         let webViewContext = "WEBVIEW_com.trident_qa.sample_app";
