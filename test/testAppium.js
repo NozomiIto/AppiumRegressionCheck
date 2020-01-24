@@ -696,7 +696,7 @@ describe("Appium", function () {
   describe("webview context test should work", function() {
     it("on Android real device", async function() {
       let caps = await androidRealDeviceBaseCapabilities();
-      caps.app = testAppDir + "/webview_app_debug.apk";
+      caps.app = "https://github.com/Magic-Pod/AppiumRegressionCheck/blog/master/test_app/webview_app_debug.apk?raw=true";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
         await driver.init(caps);
