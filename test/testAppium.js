@@ -708,7 +708,8 @@ describe("Appium", function () {
   describe("webview context test should work", function() {
     it("on Android real device", async function() {
       let caps = await androidRealDeviceBaseCapabilities();
-      caps.app = "https://github.com/Magic-Pod/AppiumRegressionCheck/blog/master/test_app/webview_app_debug.apk?raw=true";
+      caps.app = "https://github.com/Magic-Pod/AppiumRegressionCheck/blob/master/test_app/webview_app_debug.apk?raw=true";
+      // let driver = wd.promiseChainRemote('https://gwjp.appkitbox.com/wd/hub');
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
         await driver.init(caps);
@@ -730,7 +731,9 @@ describe("Appium", function () {
     it("on iOS real device", async function() {
       let caps = iOSRealDeviceBaseCapabilities();
       caps.app = "https://github.com/Magic-Pod/AppiumRegressionCheck/blob/master/test_app/iOSWebView.ipa?raw=true";
+      // let driver = wd.promiseChainRemote('https://gwjp.appkitbox.com/wd/hub');
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
+
       try {
         await driver.init(caps);
         let singleWebViewLine = await driver.elementByAccessibilityId("SingleWebView");
