@@ -709,7 +709,6 @@ describe("Appium", function () {
     it("on Android real device", async function() {
       let caps = await androidRealDeviceBaseCapabilities();
       caps.app = "https://github.com/Magic-Pod/AppiumRegressionCheck/blob/master/test_app/webview_app_debug.apk?raw=true";
-      // let driver = wd.promiseChainRemote('https://gwjp.appkitbox.com/wd/hub');
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
         await driver.init(caps);
@@ -727,11 +726,9 @@ describe("Appium", function () {
       }
     });
 
-    // TODO this does not work yet
     it("on iOS real device", async function() {
       let caps = iOSRealDeviceBaseCapabilities();
       caps.app = "https://github.com/Magic-Pod/AppiumRegressionCheck/blob/master/test_app/iOSWebView.ipa?raw=true";
-      // let driver = wd.promiseChainRemote('https://gwjp.appkitbox.com/wd/hub');
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
 
       try {
@@ -740,9 +737,12 @@ describe("Appium", function () {
         await singleWebViewLine.click();
         let contexts = await driver.contexts();
         console.log(contexts);
-        let webViewContext = "WEBVIEW_com.trident_qa.sample_app";
-        assert(contexts.includes(webViewContext));
-        await driver.context(webViewContext); // context switch
+        await sleep(3000);
+        contexts = await driver.contexts();
+        console.log(contexts);
+        assert(contexts.length == 2);
+        assert(contexts[1].startsWith("WEBVIEW_"));
+        await driver.context(contexts[1]); // context switch
         let release = await driver.elementByXPath("//a[text()='Releases']");
         await release.click();
       } finally {
