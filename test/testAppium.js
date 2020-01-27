@@ -60,7 +60,7 @@ let alreadyRunIOSRealDeviceWithUseNewWDA = false; // for https://github.com/Magi
 function iOSRealDeviceBaseCapabilities () {
   let caps = {
     platformName: 'iOS',
-    platformVersion: '13.3',
+    platformVersion: '12.2', // dummy which is the same as Magic Pod
     deviceName: 'real device', // dummy
     udid: 'auto',
     automationName: 'XCUITest',
