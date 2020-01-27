@@ -735,10 +735,12 @@ describe("Appium", function () {
         await driver.init(caps);
         let singleWebViewLine = await driver.elementByAccessibilityId("SingleWebView");
         await singleWebViewLine.click();
+
+        // call contexts twice for https://github.com/Magic-Pod/AppiumRegressionCheck/issues/30
         let contexts = await driver.contexts();
-        console.log(contexts);
         await sleep(3000);
         contexts = await driver.contexts();
+
         console.log(contexts);
         assert(contexts.length == 2);
         assert(contexts[1].startsWith("WEBVIEW_"));
