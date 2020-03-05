@@ -394,6 +394,9 @@ describe("Appium", function () {
   let java9AppiumServer = null;
 
   before(async function () {
+    // remove old caches
+    rimraf.sync(path.join(process.env["HOME"], "Library/Developer/Xcode/DerivedData/WebDriverAgent-*"));
+
     java8AppiumServer = await launchAppiumServer("1.8", java8Port);
     java9AppiumServer = await launchAppiumServer("9", java9Port);
     await sleep(12000); // TODO smarter wait
