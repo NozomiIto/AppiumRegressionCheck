@@ -665,11 +665,15 @@ describe("Appium", function () {
         await driver.init(caps);
         let graphics = await driver.elementByXPath("//android.widget.TextView[@content-desc='Graphics']");
         await graphics.click();
+        let rootElement = await driver.elementByXPath("//*[1]");
+        let size = await rootElement.getSize();
         for (let i = 0; i < 8; i++) {
-          console.log("scroll");
+          let x = Math.floor(size["width"] / 2);
+          let y = Math.floor(size["height"] / 2);
+          console.log(util.format("scroll from (%d, %d) to (%d, 0)", x, y, x));
           // scroll happens only when moveTo handles its argument as the absolute position
           let action = new TouchAction(driver);
-          action.press({x: 200, y:400}).wait({ms: 500}).moveTo({x:200, y:0}).release();
+          action.press({x: x, y:y}).wait({ms: 500}).moveTo({x:x, y:0}).release();
           await driver.performTouchAction(action);
           await sleep(1000);
         }
