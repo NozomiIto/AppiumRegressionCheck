@@ -131,12 +131,12 @@ async function androidRealDeviceBaseCapabilities () {
   };
 }
 
-function android7EmulatorBaseCapabilities () {
+function android9EmulatorBaseCapabilities () {
   return {
     'platformName': 'Android',
     'deviceName': 'Android Emulator',
     'automationName': 'uiautomator2',
-    'avd': process.env.AVD7_FOR_MAGIC_POD,
+    'avd': process.env.AVD9_FOR_MAGIC_POD,
     // Since Magic Pod always skip the initial activity wait so that users don't need to care about appWaitActivity,
     // we also skip this wait by specifying 'appWaitActivity': '*'
     'appWaitActivity': '*',
@@ -145,12 +145,12 @@ function android7EmulatorBaseCapabilities () {
   }
 }
 
-function android8EmulatorBaseCapabilities () {
+function android10EmulatorBaseCapabilities () {
   return {
     'platformName': 'Android',
     'deviceName': 'Android Emulator',
     'automationName': 'uiautomator2',
-    'avd': process.env.AVD8_FOR_MAGIC_POD,
+    'avd': process.env.AVD10_FOR_MAGIC_POD,
     // Since Magic Pod always skip the initial activity wait so that users don't need to care about appWaitActivity,
     // we also skip this wait by specifying 'appWaitActivity': '*'
     'appWaitActivity': '*',
@@ -488,9 +488,9 @@ describe("Appium", function () {
       // assume following apps have been installed
       ['appPackage', 'com.google.android.apps.maps', 'appActivity', 'com.google.android.maps.MapsActivity', true]
     ])
-    .it("should work with Android7 emulator with Java8: %s=%s",
+    .it("should work with Android9 emulator with Java8: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2, additionalCheck) => {
-          let caps = android7EmulatorBaseCapabilities();
+          let caps = android9EmulatorBaseCapabilities();
           caps[targetKey1] = targetValue1;
           if (targetKey2) {
             caps[targetKey2] = targetValue2;
@@ -502,9 +502,9 @@ describe("Appium", function () {
     forEach([
       ['app', testAppDir + "/ApiDemos-debug.apk", null, null, true]
     ])
-    .it("should work with Android7 emulator with Java9: %s=%s",
+    .it("should work with Android10 emulator with Java9: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2, additionalCheck) => {
-          let caps = android7EmulatorBaseCapabilities();
+          let caps = android10EmulatorBaseCapabilities();
           caps[targetKey1] = targetValue1;
           if (targetKey2) {
             caps[targetKey2] = targetValue2;
@@ -516,9 +516,9 @@ describe("Appium", function () {
     forEach([
       ['app', testAppDir + "/ApiDemos-debug.apk", null, null, true]
     ])
-    .it("should work with Android8 emulator with Java8: %s=%s",
+    .it("should work with Android10 emulator with Java8: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2, additionalCheck) => {
-          let caps = android8EmulatorBaseCapabilities();
+          let caps = android10EmulatorBaseCapabilities();
           caps[targetKey1] = targetValue1;
           if (targetKey2) {
             caps[targetKey2] = targetValue2;
@@ -531,9 +531,9 @@ describe("Appium", function () {
       // assume following apps have been installed
       ['appPackage', 'com.android.vending', 'appActivity', '.AssetBrowserActivity', true]
     ])
-    .it("should work with Android8 emulator with Java9: %s=%s",
+    .it("should work with Android10 emulator with Java9: %s=%s",
         async (targetKey1, targetValue1, targetKey2, targetValue2, additionalCheck) => {
-          let caps = android8EmulatorBaseCapabilities();
+          let caps = android10EmulatorBaseCapabilities();
           caps[targetKey1] = targetValue1;
           if (targetKey2) {
             caps[targetKey2] = targetValue2;
