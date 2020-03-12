@@ -5,17 +5,14 @@
 const chai = require("chai");
 const assert = chai.assert;
 const forEach = require('mocha-each');
-const sizeOf = require('image-size');
 const rimraf = require("rimraf");
 const wd = require("wd");
-const webdriverio = require("webdriverio");
 const TouchAction = wd.TouchAction;
 const util = require("util");
 const path = require("path");
 const childProcess = require("child_process");
 const teenProcess = require('teen_process');
 const requestPromise = require("request-promise");
-const xpath = require('xpath');
 const xmlDom = require('xmldom');
 const nodeSimctl = require('node-simctl');
 
@@ -109,7 +106,7 @@ async function getAndroidRealDeviceUdid() {
       continue;
     }
     let deviceName = deviceDef.split(/\s+/)[0].trim();
-    if (deviceName.indexOf("emulator") == -1) {
+    if (deviceName.indexOf("emulator") === -1) {
       return deviceName;
     }
   }
@@ -242,7 +239,7 @@ function getFirstElementChild (parent) {
   let childNodes = parent.childNodes;
   for (let i = 0; i < childNodes.length; i++) {
     let childNode = childNodes[i];
-    if (childNode.constructor.name == "Element") {
+    if (childNode.constructor.name === "Element") {
       return childNode;
     }
   }
@@ -278,8 +275,8 @@ async function simpleCheck (caps, serverPort, additionalCheck) {
       // check lock/unlock behavior just for simulator and emulator
       // (since unlock command for the real device requires the change for the unlock password of the device
       // and it is troublesome)
-      if ((caps.platformName == "iOS" && caps.deviceName != 'real device')
-          || (caps.platformName == "Android" && caps.deviceName == "Android Emulator")) {
+      if ((caps.platformName === "iOS" && caps.deviceName !== 'real device')
+          || (caps.platformName === "Android" && caps.deviceName === "Android Emulator")) {
         console.log("lock");
         await driver.lock();
         await sleep(1000);
@@ -315,7 +312,7 @@ async function simpleCheck (caps, serverPort, additionalCheck) {
       await driver.performTouchAction(action);
 
       // check getting the focused activity works for Android
-      if (caps.platformName == "Android") {
+      if (caps.platformName === "Android") {
         console.log("package and activity");
         let pkg = await driver.getCurrentPackage();
         assert.isTrue(!!pkg); // not null nor empty
@@ -335,7 +332,7 @@ async function simpleCheck (caps, serverPort, additionalCheck) {
       console.log("screenshot again");
       await checkScreenshotWorks(driver);
       console.log("page source again");
-      await checkSourceWorks(driver, caps.platformName == "iOS");
+      await checkSourceWorks(driver, caps.platformName === "iOS");
     }
   } finally {
     try {
@@ -431,8 +428,8 @@ describe("Appium", function () {
     ])
     .it("should work with headless udid iOS simulator13: %s=%s", async (targetKey, targetValue, additionalCheck) => {
       let devices = (await nodeSimctl.getDevices())["13.3"];
-      devices = devices.filter((device) => device.name.indexOf("iPhone 8") != -1);
-      if (devices.length == 0) {
+      devices = devices.filter((device) => device.name.indexOf("iPhone 8") !== -1);
+      if (devices.length === 0) {
         throw new Error("cannot find the simulator for iOS 13.3 and iPhone 8. Please prepare it.");
       }
       let udid = devices[0].udid;
