@@ -34,6 +34,7 @@ the test calls main.js by node instead of the Appium executable.
 
 # Our test result
 
+- Appium 1.17.0: passed all tests
 - Appium 1.16.0: passed all tests
 - Appium 1.15.0: passed all tests, but seems to has some problems like [this](https://github.com/Magic-Pod/AppiumRegressionCheck/issues/26) and [this](https://github.com/Magic-Pod/AppiumRegressionCheck/issues/27) and [this](https://github.com/appium/appium/issues/13302) and [this](https://github.com/appium/appium/issues/13288).
 - Appium 1.14.0: passed all tests
