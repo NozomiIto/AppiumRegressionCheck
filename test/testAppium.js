@@ -42,7 +42,7 @@ function iOS13SimulatorForUdidBaseCapabilities (udid) {
 function iOS13SimulatorBaseCapabilities () {
   return {
     platformName: 'iOS',
-    platformVersion: '13.3',
+    platformVersion: '13.4',
     deviceName: 'iPhone 8',
     automationName: 'XCUITest',
     showXcodeLog: true,
@@ -427,10 +427,10 @@ describe("Appium", function () {
       ['bundleId', 'com.apple.Preferences', false]
     ])
     .it("should work with headless udid iOS simulator13: %s=%s", async (targetKey, targetValue, additionalCheck) => {
-      let devices = (await nodeSimctl.getDevices())["13.3"];
+      let devices = (await nodeSimctl.getDevices())["13.4"];
       devices = devices.filter((device) => device.name.indexOf("iPhone 8") !== -1);
       if (devices.length === 0) {
-        throw new Error("cannot find the simulator for iOS 13.3 and iPhone 8. Please prepare it.");
+        throw new Error("cannot find the simulator for iOS 13.4 and iPhone 8. Please prepare it.");
       }
       let udid = devices[0].udid;
       let caps = iOS13SimulatorForUdidBaseCapabilities(udid);
@@ -587,13 +587,13 @@ describe("Appium", function () {
   describe("mobile: scroll should work", function () {
     it("on iOS simulator13", async function () {
       let caps = iOS13SimulatorBaseCapabilities();
-      caps.app = testAppDir + "/UICatalog.app";
+      caps.app = testAppDir + "/UIKitCatalog.app";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
         await driver.init(caps);
-        let element = await driver.elementByXPath("//XCUIElementTypeStaticText[@name='Search Bars']/parent::*");
+        let element = await driver.elementByXPath("//XCUIElementTypeStaticText[@name='Toolbars']");
         await driver.execute("mobile: scroll", {element: element, toVisible: true});
-        element = await driver.elementByXPath("//XCUIElementTypeStaticText[@name='Search Bars']/parent::*");
+        element = await driver.elementByXPath("//XCUIElementTypeStaticText[@name='Toolbars']");
         await element.click();
         await driver.elementById("Default");
         await driver.elementById("Custom");
