@@ -52,8 +52,6 @@ function iOS13SimulatorBaseCapabilities () {
   };
 }
 
-let alreadyRunIOSRealDeviceWithUseNewWDA = false; // for https://github.com/Magic-Pod/AppiumRegressionCheck/issues/26
-
 function iOSRealDeviceBaseCapabilities () {
   let caps = {
     platformName: 'iOS',
@@ -69,10 +67,6 @@ function iOSRealDeviceBaseCapabilities () {
   };
   if (process.env.UPDATED_WDA_BUNDLE_ID_FOR_MAGIC_POD) {
     caps.updatedWDABundleId = process.env.UPDATED_WDA_BUNDLE_ID_FOR_MAGIC_POD;
-  }
-  if (!alreadyRunIOSRealDeviceWithUseNewWDA) {
-    alreadyRunIOSRealDeviceWithUseNewWDA = true;
-    caps.useNewWDA = true;
   }
   return caps;
 }
