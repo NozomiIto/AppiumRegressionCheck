@@ -42,7 +42,7 @@ function iOS13SimulatorForUdidBaseCapabilities (udid) {
 function iOS13SimulatorBaseCapabilities () {
   return {
     platformName: 'iOS',
-    platformVersion: '13.4',
+    platformVersion: '13.5',
     deviceName: 'iPhone 8',
     automationName: 'XCUITest',
     showXcodeLog: true,
@@ -710,7 +710,7 @@ describe("Appium", function () {
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
         await driver.init(caps);
-        let githubAppium2Line = await driver.elementByXPath("//*[@text='GITHUB APPIUM WEBVIEW2']");
+        let githubAppium2Line = await driver.elementByXPath("//*[@text='GITHUB APPIUM WEBVIEW']");
         await githubAppium2Line.click();
         let contexts = await driver.contexts();
         console.log(contexts);
@@ -731,7 +731,7 @@ describe("Appium", function () {
 
       try {
         await driver.init(caps);
-        let singleWebViewLine = await driver.elementByAccessibilityId("SingleWebView");
+        let singleWebViewLine = await driver.elementByAccessibilityId("GITHUB APPIUM WEBVIEW");
         await singleWebViewLine.click();
 
         // call contexts twice for https://github.com/Magic-Pod/AppiumRegressionCheck/issues/30

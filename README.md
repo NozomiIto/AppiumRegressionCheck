@@ -34,6 +34,7 @@ the test calls main.js by node instead of the Appium executable.
 
 # Our test result
 
+- Appium 1.18.0: passed all tests
 - Appium 1.17.1: passed all tests. This version is required to make iOS13.4 webview tests work
 - Appium 1.17.0: passed all tests
 - Appium 1.16.0: passed all tests
