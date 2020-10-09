@@ -25,7 +25,7 @@ const iosSimulatorWdaPort = 8100;
 const iosRealDeviceWdaPort = 8101;
 // TODO session attach/detach test
 
-function iOS13SimulatorForUdidBaseCapabilities (udid) {
+function iOS14SimulatorForUdidBaseCapabilities (udid) {
   return {
     platformName: 'iOS',
     platformVersion: '9.9',  // actually dummy
@@ -39,10 +39,10 @@ function iOS13SimulatorForUdidBaseCapabilities (udid) {
   };
 }
 
-function iOS13SimulatorBaseCapabilities () {
+function iOS14SimulatorBaseCapabilities () {
   return {
     platformName: 'iOS',
-    platformVersion: '13.6',
+    platformVersion: '14.0',
     deviceName: 'iPhone 8',
     automationName: 'XCUITest',
     showXcodeLog: true,
@@ -76,7 +76,7 @@ async function iOSRTKBaseCapabilities () {
     platformName: 'iOS',
     automationName: 'XCUITest',
     deviceName: 'iPhone 11 Pro',
-    platformVersion: '13',
+    platformVersion: '14',
     showXcodeLog: true,
     useJSONSource: true, // more stable and faster
     accessToken: process.env.RTK_ACCESS_TOKEN,
@@ -408,8 +408,8 @@ describe("Appium", function () {
       ['bundleId', 'com.apple.Preferences', false, true],
       ['bundleId', 'com.apple.mobileslideshow', true, false]
     ])
-    .it("should work with iOS simulator13: %s=%s", async (targetKey, targetValue, additionalCheck, reduceMotion) => {
-      let caps = iOS13SimulatorBaseCapabilities();
+    .it("should work with iOS simulator14: %s=%s", async (targetKey, targetValue, additionalCheck, reduceMotion) => {
+      let caps = iOS14SimulatorBaseCapabilities();
       caps[targetKey] = targetValue;
       if (reduceMotion) {
         caps["reduceMotion"] = true;
@@ -420,14 +420,14 @@ describe("Appium", function () {
     forEach([
       ['bundleId', 'com.apple.Preferences', false]
     ])
-    .it("should work with headless udid iOS simulator13: %s=%s", async (targetKey, targetValue, additionalCheck) => {
-      let devices = (await nodeSimctl.getDevices())["13.6"];
+    .it("should work with headless udid iOS simulator14: %s=%s", async (targetKey, targetValue, additionalCheck) => {
+      let devices = (await nodeSimctl.getDevices())["14.0"];
       devices = devices.filter((device) => device.name.indexOf("iPhone 8") !== -1);
       if (devices.length === 0) {
-        throw new Error("cannot find the simulator for iOS 13.6 and iPhone 8. Please prepare it.");
+        throw new Error("cannot find the simulator for iOS 14.0 and iPhone 8. Please prepare it.");
       }
       let udid = devices[0].udid;
-      let caps = iOS13SimulatorForUdidBaseCapabilities(udid);
+      let caps = iOS14SimulatorForUdidBaseCapabilities(udid);
       caps.isHeadless = true
       caps.reduceMotion = true;
       caps[targetKey] = targetValue;
@@ -534,8 +534,8 @@ describe("Appium", function () {
   });
 
   describe("iOS screenshot and source should work in various situation", function () {
-    it("on iOS simulator13", async function () {
-      let caps = iOS13SimulatorBaseCapabilities();
+    it("on iOS simulator14", async function () {
+      let caps = iOS14SimulatorBaseCapabilities();
       caps.app = testAppDir + "/AppiumRegressionTestApp.app";
       caps.fullReset = true;
       await iOSAppiumRegressionTestAppCheck(caps, iosSimulatorWdaPort);
@@ -550,8 +550,8 @@ describe("Appium", function () {
   });
 
   describe("iOS source contents should be valid", function () {
-    it("on iOS simulator13", async function () {
-      let caps = iOS13SimulatorBaseCapabilities();
+    it("on iOS simulator14", async function () {
+      let caps = iOS14SimulatorBaseCapabilities();
       caps.app = testAppDir + "/magic_pod_demo_app.app";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
@@ -579,8 +579,8 @@ describe("Appium", function () {
   });
 
   describe("mobile: scroll should work", function () {
-    it("on iOS simulator13", async function () {
-      let caps = iOS13SimulatorBaseCapabilities();
+    it("on iOS simulator14", async function () {
+      let caps = iOS14SimulatorBaseCapabilities();
       caps.app = testAppDir + "/UIKitCatalog.app";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
@@ -644,8 +644,8 @@ describe("Appium", function () {
   })
 
   describe("moveTo action should work", function () {
-    it("on iOS simulator13", async function () {
-      let caps = iOS13SimulatorBaseCapabilities();
+    it("on iOS simulator14", async function () {
+      let caps = iOS14SimulatorBaseCapabilities();
       caps.app = testAppDir + "/UICatalog.app";
       await uiCatalogMoveToTest(caps);
     });
@@ -683,11 +683,11 @@ describe("Appium", function () {
   });
 
   describe("parallel Appium server run should work", function () {
-    it("on iOS simulator13", async function () {
+    it("on iOS simulator14", async function () {
       rimraf.sync(__dirname + "/../DerivedData1");
       rimraf.sync(__dirname + "/../DerivedData2");
-      let caps1 = iOS13SimulatorBaseCapabilities();
-      let caps2 = iOS13SimulatorBaseCapabilities();
+      let caps1 = iOS14SimulatorBaseCapabilities();
+      let caps2 = iOS14SimulatorBaseCapabilities();
       caps1.wdaLocalPort = 8102;
       caps2.wdaLocalPort = 8103;
       caps1.derivedDataPath = __dirname + "/../DerivedData1";
