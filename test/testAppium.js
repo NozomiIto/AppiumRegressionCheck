@@ -421,7 +421,8 @@ describe("Appium", function () {
       ['bundleId', 'com.apple.Preferences', false]
     ])
     .it("should work with headless udid iOS simulator14: %s=%s", async (targetKey, targetValue, additionalCheck) => {
-      let devices = (await nodeSimctl.getDevices())["14.0"];
+      const simctl = new nodeSimctl.Simctl();
+      let devices = (await simctl.getDevices())["14.2"];
       devices = devices.filter((device) => device.name.indexOf("iPhone 8") !== -1);
       if (devices.length === 0) {
         throw new Error("cannot find the simulator for iOS 14.0 and iPhone 8. Please prepare it.");
@@ -751,7 +752,7 @@ describe("Appium", function () {
     });
   });
 
-  describe("uiAutomator2 and Espresso combination should work", function() {
+  describe.skip("uiAutomator2 and Espresso combination should work", function() {
     it("on Android real device", async function() {
       let eCaps = await androidEspressoBaseCapabilities();
       eCaps.app = testAppDir + "/ApiDemos-debug.apk";
