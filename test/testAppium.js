@@ -42,7 +42,7 @@ function iOS14SimulatorForUdidBaseCapabilities (udid) {
 function iOS14SimulatorBaseCapabilities () {
   return {
     platformName: 'iOS',
-    platformVersion: '14.0',
+    platformVersion: '14.2',
     deviceName: 'iPhone 8',
     automationName: 'XCUITest',
     showXcodeLog: true,
