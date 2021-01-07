@@ -34,6 +34,7 @@ the test calls main.js by node instead of the Appium executable.
 
 # Our test result
 
+- Appium 1.20.0: passed all tests. Note that on iOS accessibility id does not likely work when label == value && label != name && value != name 
 - Appium 1.19.1: passed all tests while skipping 1 test about Espresso plus UIAutomator2 usage 
 - Appium 1.18.1: passed all tests
 - Appium 1.18.0: passed all tests, but seems to have [a problem](https://github.com/appium/appium/issues/14586).
