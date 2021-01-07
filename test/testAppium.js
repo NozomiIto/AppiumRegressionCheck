@@ -42,7 +42,7 @@ function iOS14SimulatorForUdidBaseCapabilities (udid) {
 function iOS14SimulatorBaseCapabilities () {
   return {
     platformName: 'iOS',
-    platformVersion: '14.2',
+    platformVersion: '14.3',
     deviceName: 'iPhone 8',
     automationName: 'XCUITest',
     showXcodeLog: true,
@@ -351,6 +351,7 @@ async function iOSAppiumRegressionTestAppCheck (caps, wdaPort) {
     console.log("session-less screenshot for system alert");
     await checkSessionLessScreenshotWorks(driver, wdaPort);
 
+    // TODO: Once this alert accepted, it will never appear again untill you reset Location & Privacy from setting app most likely on iOS 14.3
     await driver.acceptAlert(); // currently the alert must be displayed
 
     console.log("session-less screenshot for normal page");
@@ -422,7 +423,7 @@ describe("Appium", function () {
     ])
     .it("should work with headless udid iOS simulator14: %s=%s", async (targetKey, targetValue, additionalCheck) => {
       const simctl = new nodeSimctl.Simctl();
-      let devices = (await simctl.getDevices())["14.2"];
+      let devices = (await simctl.getDevices())["14.3"];
       devices = devices.filter((device) => device.name.indexOf("iPhone 8") !== -1);
       if (devices.length === 0) {
         throw new Error("cannot find the simulator for iOS 14.0 and iPhone 8. Please prepare it.");
@@ -651,7 +652,7 @@ describe("Appium", function () {
       await uiCatalogMoveToTest(caps);
     });
 
-    it("on Android", async function () {
+    it("on Android real device", async function () {
       let caps = await androidRealDeviceBaseCapabilities();
       caps.noReset = false; // reset app state
       caps.app = testAppDir + "/ApiDemos-debug.apk";
@@ -710,15 +711,24 @@ describe("Appium", function () {
       caps.app = "https://github.com/Magic-Pod/AppiumRegressionCheck/blob/master/test_app/webview_app_debug.apk?raw=true";
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
       try {
+        // When: Go to webview page
         await driver.init(caps);
-        let githubAppium2Line = await driver.elementByXPath("//*[@text='GITHUB APPIUM WEBVIEW']");
+        const githubAppium2Line = await driver.elementByXPath("//*[@text='GITHUB APPIUM WEBVIEW']");
         await githubAppium2Line.click();
+        // Then: Able to see web context 
         let contexts = await driver.contexts();
+        for (let i = 0; i < 10 && contexts.length === 1; i++) {
+          await sleep(3000);
+          contexts = await driver.contexts();
+        }
         console.log(contexts);
-        let webViewContext = "WEBVIEW_com.trident_qa.sample_app";
+        const webViewContext = "WEBVIEW_com.trident_qa.sample_app";
         assert(contexts.includes(webViewContext));
-        await driver.context(webViewContext); // context switch
-        let release = await driver.elementByXPath("//a[text()='Releases']");
+
+        // When: switch to web context 
+        await driver.context(webViewContext);
+        // Then: Able to click web element 
+        const release = await driver.elementByXPath("//a[text()='Releases']");
         await release.click();
       } finally {
         await driver.quit();
@@ -731,20 +741,25 @@ describe("Appium", function () {
       let driver = wd.promiseChainRemote(util.format('http://localhost:%d/wd/hub', java8Port));
 
       try {
+        // When: Go to webview page 
         await driver.init(caps);
-        let singleWebViewLine = await driver.elementByAccessibilityId("GITHUB APPIUM WEBVIEW");
+        const singleWebViewLine = await driver.elementByAccessibilityId("GITHUB APPIUM WEBVIEW");
         await singleWebViewLine.click();
 
-        // call contexts twice for https://github.com/Magic-Pod/AppiumRegressionCheck/issues/30
+        // Then: Able to see web context 
         let contexts = await driver.contexts();
-        await sleep(3000);
-        contexts = await driver.contexts();
-
+        for (let i = 0; i < 10 && contexts.length === 1; i++) {
+          await sleep(3000);
+          contexts = await driver.contexts();
+        }
         console.log(contexts);
         assert(contexts.length == 2);
         assert(contexts[1].startsWith("WEBVIEW_"));
-        await driver.context(contexts[1]); // context switch
-        let release = await driver.elementByXPath("//a[text()='Releases']");
+
+        // When: switch to web context
+        await driver.context(contexts[1]);
+        // Then: Able to click web element 
+        const release = await driver.elementByXPath("//a[text()='Releases']");
         await release.click();
       } finally {
         await driver.quit();
