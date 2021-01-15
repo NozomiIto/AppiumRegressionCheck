@@ -34,14 +34,15 @@ the test calls main.js by node instead of the Appium executable.
 
 # Our test result
 
-- Appium 1.20.0: passed all tests. Note that on iOS accessibility id does not likely work when label == value && label != name && value != name 
-- Appium 1.19.1: passed all tests while skipping 1 test about Espresso plus UIAutomator2 usage 
-- Appium 1.18.1: passed all tests
+- Appium 1.20.1: passed all tests.
+- Appium 1.20.0: passed all tests.
+- Appium 1.19.1: passed all tests while skipping 1 test about Espresso plus UIAutomator2 usage. 
+- Appium 1.18.1: passed all tests.
 - Appium 1.18.0: passed all tests, but seems to have [a problem](https://github.com/appium/appium/issues/14586).
-- Appium 1.17.1: passed all tests. This version is required to make iOS13.4 webview tests work
-- Appium 1.17.0: passed all tests
-- Appium 1.16.0: passed all tests
+- Appium 1.17.1: passed all tests. This version is required to make iOS13.4 webview tests work.
+- Appium 1.17.0: passed all tests.
+- Appium 1.16.0: passed all tests.
 - Appium 1.15.0: passed all tests, but seems to has some problems like [this](https://github.com/Magic-Pod/AppiumRegressionCheck/issues/26) and [this](https://github.com/Magic-Pod/AppiumRegressionCheck/issues/27) and [this](https://github.com/appium/appium/issues/13302) and [this](https://github.com/appium/appium/issues/13288).
-- Appium 1.14.0: passed all tests
+- Appium 1.14.0: passed all tests.
 - Appium 1.13.0: found [a problem](https://github.com/appium/WebDriverAgent/pull/166)
 - Appium 1.12.1: passed all tests, but has [small problem](https://github.com/appium/appium/issues/12504)
