@@ -34,6 +34,7 @@ the test calls main.js by node instead of the Appium executable.
 
 # Our test result
 
+- Appium 1.20.2: passed all tests.
 - Appium 1.20.1: passed all tests.
 - Appium 1.20.0: passed all tests.
 - Appium 1.19.1: passed all tests while skipping 1 test about Espresso plus UIAutomator2 usage. 
