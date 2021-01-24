@@ -127,7 +127,7 @@ function android10EmulatorBaseCapabilities () {
     'platformName': 'Android',
     'deviceName': 'Android Emulator',
     'automationName': 'uiautomator2',
-    'avd': process.env.AVD10_FOR_MAGIC_POD,
+    'avd': 'magic_pod_emulator29',
     // Since Magic Pod always skip the initial activity wait so that users don't need to care about appWaitActivity,
     // we also skip this wait by specifying 'appWaitActivity': '*'
     'appWaitActivity': '*',
@@ -141,7 +141,7 @@ function android11EmulatorBaseCapabilities () {
     'platformName': 'Android',
     'deviceName': 'Android Emulator',
     'automationName': 'uiautomator2',
-    'avd': process.env.AVD11_FOR_MAGIC_POD,
+    'avd': 'magic_pod_emulator30',
     // Since Magic Pod always skip the initial activity wait so that users don't need to care about appWaitActivity,
     // we also skip this wait by specifying 'appWaitActivity': '*'
     'appWaitActivity': '*',
